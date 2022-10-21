@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+struct ClipView: View {
+    @State var clip: Int
+
+    var body: some View {
+        Text("\(clip)")
+    }
+}
+
 struct ClipsView: View {
     @ObservedObject private(set) var clipsViewModel: ClipsViewModel
     @Binding var code: String
@@ -41,8 +49,13 @@ struct ClipsView: View {
             
             Text("Code: \(code)")
             
+            // grid of clips, three clips per row
             ScrollView {
-                
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]) {
+                    ForEach(clipsViewModel.clips, id: \.self) { clip in
+                        ClipView(clip: clip)
+                    }
+                }
             }
         }
         .onAppear {
@@ -59,6 +72,7 @@ struct ClipsView_Previews: PreviewProvider {
 
 extension ClipsView {
     class ClipsViewModel: ObservableObject {
+        @Published var clips: [Int] = Array(0...100)
         
         init() {
             print("Initializing ClipsViewModel")
@@ -98,19 +112,19 @@ extension ClipsView {
                 let request = URLRequest(url: url ?? URL(fileURLWithPath: ""))
 
                 print("Starting GET request to \(String(describing: url))")
-                let presignedTask = URLSession.shared.dataTask(with: request) { downData, downResponse, downError in
+                let presignedTask = URLSession.shared.dataTask(with: request) { data, response, error in
                     // data validation
-                    guard let downData = downData, downError == nil else {
-                        print("error=\(String(describing: downError))")
+                    guard let data = data, error == nil else {
+                        print("error=\(String(describing: error))")
                         return
                     }
-                    if let httpStatus = downResponse as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                    if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
                         print("statusCode should be 200, but is \(httpStatus.statusCode)")
                         return
                     }
-                    let downResponseString = String(data: downData, encoding: .utf8)
-                    print("response = \(String(describing: downResponse))")
-                    print("responseString = \(String(describing: downResponseString))")
+                    let responseString = String(data: data, encoding: .utf8)
+                    print("response = \(String(describing: response))")
+                    print("responseString = \(String(describing: responseString))")
 
                     
                 }
