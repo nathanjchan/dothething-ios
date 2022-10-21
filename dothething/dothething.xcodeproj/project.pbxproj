@@ -8,13 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		D87C926C29010F2C003275C1 /* dothethingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C926B29010F2C003275C1 /* dothethingApp.swift */; };
-		D87C926E29010F2C003275C1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C926D29010F2C003275C1 /* ContentView.swift */; };
+		D87C926E29010F2C003275C1 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C926D29010F2C003275C1 /* HomeView.swift */; };
 		D87C927029010F2D003275C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D87C926F29010F2D003275C1 /* Assets.xcassets */; };
 		D87C927329010F2D003275C1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D87C927229010F2D003275C1 /* Preview Assets.xcassets */; };
 		D87C927D29010F2E003275C1 /* dothethingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C927C29010F2E003275C1 /* dothethingTests.swift */; };
 		D87C928729010F2E003275C1 /* dothethingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C928629010F2E003275C1 /* dothethingUITests.swift */; };
 		D87C928929010F2E003275C1 /* dothethingUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C928829010F2E003275C1 /* dothethingUITestsLaunchTests.swift */; };
-		D87C929629021E84003275C1 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C929529021E84003275C1 /* HomeView.swift */; };
+		D87C929629021E84003275C1 /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C929529021E84003275C1 /* ClipsView.swift */; };
+		D87C9298290226B1003275C1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C9297290226B1003275C1 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,7 +38,7 @@
 /* Begin PBXFileReference section */
 		D87C926829010F2B003275C1 /* dothething.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dothething.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D87C926B29010F2C003275C1 /* dothethingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dothethingApp.swift; sourceTree = "<group>"; };
-		D87C926D29010F2C003275C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D87C926D29010F2C003275C1 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		D87C926F29010F2D003275C1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D87C927229010F2D003275C1 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D87C927829010F2E003275C1 /* dothethingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dothethingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,7 +46,8 @@
 		D87C928229010F2E003275C1 /* dothethingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dothethingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D87C928629010F2E003275C1 /* dothethingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dothethingUITests.swift; sourceTree = "<group>"; };
 		D87C928829010F2E003275C1 /* dothethingUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dothethingUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		D87C929529021E84003275C1 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		D87C929529021E84003275C1 /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
+		D87C9297290226B1003275C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,10 +99,11 @@
 			isa = PBXGroup;
 			children = (
 				D87C926B29010F2C003275C1 /* dothethingApp.swift */,
-				D87C926D29010F2C003275C1 /* ContentView.swift */,
+				D87C926D29010F2C003275C1 /* HomeView.swift */,
 				D87C926F29010F2D003275C1 /* Assets.xcassets */,
 				D87C927129010F2D003275C1 /* Preview Content */,
-				D87C929529021E84003275C1 /* HomeView.swift */,
+				D87C929529021E84003275C1 /* ClipsView.swift */,
+				D87C9297290226B1003275C1 /* ContentView.swift */,
 			);
 			path = dothething;
 			sourceTree = "<group>";
@@ -260,8 +263,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D87C929629021E84003275C1 /* HomeView.swift in Sources */,
-				D87C926E29010F2C003275C1 /* ContentView.swift in Sources */,
+				D87C929629021E84003275C1 /* ClipsView.swift in Sources */,
+				D87C926E29010F2C003275C1 /* HomeView.swift in Sources */,
+				D87C9298290226B1003275C1 /* ContentView.swift in Sources */,
 				D87C926C29010F2C003275C1 /* dothethingApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
