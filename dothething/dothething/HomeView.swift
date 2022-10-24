@@ -53,7 +53,7 @@ struct HomeView_Previews: PreviewProvider {
 extension HomeView {
     class HomeViewModel: ObservableObject {
         init() {
-            print("Initializimg HomeViewModel")
+            print("Initializing HomeViewModel")
         }
     }
 }

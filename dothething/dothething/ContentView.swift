@@ -9,13 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     @State var code: String = ""
-    @State var toggle: Bool = true
+    @State var showHome: Bool = true
 
     var body: some View {
-        if toggle {
-            HomeView(homeViewModel: HomeView.HomeViewModel(), code: $code, toggle: $toggle)
+        if showHome {
+            HomeView(homeViewModel: HomeView.HomeViewModel(), code: $code, toggle: $showHome)
         } else {
-            ClipsView(clipsViewModel: ClipsView.ClipsViewModel(), code: $code, toggle: $toggle)
+            ClipsView(clipsViewModel: ClipsView.ClipsViewModel(), code: $code, toggle: $showHome)
         }
     }
 }

@@ -16,6 +16,9 @@
 		D87C928929010F2E003275C1 /* dothethingUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C928829010F2E003275C1 /* dothethingUITestsLaunchTests.swift */; };
 		D87C929629021E84003275C1 /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C929529021E84003275C1 /* ClipsView.swift */; };
 		D87C9298290226B1003275C1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C9297290226B1003275C1 /* ContentView.swift */; };
+		D89518F929035AEF005AE8BF /* ZipArchive in Frameworks */ = {isa = PBXBuildFile; productRef = D89518F829035AEF005AE8BF /* ZipArchive */; };
+		D89518FB29035EF4005AE8BF /* Thinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89518FA29035EF4005AE8BF /* Thinger.swift */; };
+		D89518FD290522CF005AE8BF /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89518FC290522CF005AE8BF /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +51,8 @@
 		D87C928829010F2E003275C1 /* dothethingUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dothethingUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		D87C929529021E84003275C1 /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
 		D87C9297290226B1003275C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D89518FA29035EF4005AE8BF /* Thinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thinger.swift; sourceTree = "<group>"; };
+		D89518FC290522CF005AE8BF /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D89518F929035AEF005AE8BF /* ZipArchive in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +110,8 @@
 				D87C927129010F2D003275C1 /* Preview Content */,
 				D87C929529021E84003275C1 /* ClipsView.swift */,
 				D87C9297290226B1003275C1 /* ContentView.swift */,
+				D89518FA29035EF4005AE8BF /* Thinger.swift */,
+				D89518FC290522CF005AE8BF /* ImagePicker.swift */,
 			);
 			path = dothething;
 			sourceTree = "<group>";
@@ -149,6 +157,9 @@
 			dependencies = (
 			);
 			name = dothething;
+			packageProductDependencies = (
+				D89518F829035AEF005AE8BF /* ZipArchive */,
+			);
 			productName = dothething;
 			productReference = D87C926829010F2B003275C1 /* dothething.app */;
 			productType = "com.apple.product-type.application";
@@ -221,6 +232,9 @@
 				Base,
 			);
 			mainGroup = D87C925F29010F2B003275C1;
+			packageReferences = (
+				D89518F729035AEF005AE8BF /* XCRemoteSwiftPackageReference "ZipArchive" */,
+			);
 			productRefGroup = D87C926929010F2B003275C1 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -266,7 +280,9 @@
 				D87C929629021E84003275C1 /* ClipsView.swift in Sources */,
 				D87C926E29010F2C003275C1 /* HomeView.swift in Sources */,
 				D87C9298290226B1003275C1 /* ContentView.swift in Sources */,
+				D89518FD290522CF005AE8BF /* ImagePicker.swift in Sources */,
 				D87C926C29010F2C003275C1 /* dothethingApp.swift in Sources */,
+				D89518FB29035EF4005AE8BF /* Thinger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,6 +607,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D89518F729035AEF005AE8BF /* XCRemoteSwiftPackageReference "ZipArchive" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ZipArchive/ZipArchive.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D89518F829035AEF005AE8BF /* ZipArchive */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D89518F729035AEF005AE8BF /* XCRemoteSwiftPackageReference "ZipArchive" */;
+			productName = ZipArchive;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D87C926029010F2B003275C1 /* Project object */;
 }
