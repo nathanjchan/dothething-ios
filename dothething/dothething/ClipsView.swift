@@ -40,6 +40,7 @@ struct ClipsView: View {
                 // back button
                 Button(action: {
                     print("Back button tapped")
+                    clipsViewModel.backButtonPressed()
                     toggle.toggle()
                 }) {
                     Text("Back")
@@ -71,8 +72,8 @@ struct ClipsView: View {
                     .scaleEffect(x: 2, y: 2, anchor: .center)
                     .padding(.top)
                 Spacer()
-            } else if !clipsViewModel.helpfulText.isEmpty {
-                Text(clipsViewModel.helpfulText)
+            } else if !clipsViewModel.errorText.isEmpty {
+                Text(clipsViewModel.errorText)
                     .padding(.top)
                     .foregroundColor(Color(UIColor.systemGray))
                 Spacer()
@@ -121,18 +122,18 @@ struct Clip: Hashable {
 extension ClipsView {
     class ClipsViewModel: ObservableObject {
         @Published var clips: [Clip] = [
-            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: true),
-            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false),
-            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false)
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: true),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false)
         ]
         @Published var isLoading = false
         @Published var shareDisabled = true
         @Published var uploadDisabled = true
-        @Published var helpfulText = ""
+        @Published var errorText = ""
         
         private var code = ""
         private var videoDegreesToRotate = -90
-        private var unzippedFileUrl: URL = URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: "")
+        private let password = "ThisIsEpicPassword"
 
         private lazy var imagePicker = ImagePicker(viewModel: self)
 
@@ -141,10 +142,18 @@ extension ClipsView {
         }
 
         func enterCode(code: String) {
-            print("Entered enterCode with code: \(code)")
-            self.code = code
-            self.isLoading = true
-            self.getPresignedUrlForDownload()
+            if self.clips.isEmpty {
+                print("Entered enterCode with code: \(code)")
+                self.code = code
+                self.isLoading = true
+                self.downloadExistingThing()
+            } else {
+                print("Ignoring enterCode because clips is empty")
+            }
+        }
+        
+        func backButtonPressed() {
+            self.clearStorage()
         }
 
         func shareButtonPressed() {
@@ -161,9 +170,6 @@ extension ClipsView {
                 print("Upload button disabled")
                 return
             }
-            DispatchQueue.main.async {
-                self.isLoading = true
-            }
             self.imagePicker.open()
         }
         
@@ -179,138 +185,52 @@ extension ClipsView {
             }
         }
         
-        private func stopLoading(text: String) {
+        private func stopLoadingDueToError(text: String) {
             DispatchQueue.main.async {
-                self.helpfulText = text
+                self.errorText = text
                 self.isLoading = false
             }
         }
         
         private func handleStatusCodeError(statusCode: Int) {
+            print("statusCode should be 200, but is \(statusCode)")
             if statusCode == 404 {
-                self.stopLoading(text: "Status Code 404: Invalid Code")
+                self.stopLoadingDueToError(text: "Status Code 404: Invalid Code")
             } else {
-                self.stopLoading(text: "Status Code \(statusCode)")
+                self.stopLoadingDueToError(text: "Status Code \(statusCode)")
             }
         }
         
         private func handleGenericError(errorCode: String) {
-            self.stopLoading(text: "Error Code \(errorCode)")
+            self.stopLoadingDueToError(text: "Error Code \(errorCode)")
         }
 
         private func clearStorage() {
-            // delete unzipped folder and references to them
-            let fileManager = FileManager.default
-            do {
-                try fileManager.removeItem(at: self.unzippedFileUrl)
-                print("Cleared temporary directory")
-            } catch {
-                print("Error clearing temporary directory")
-            }
             DispatchQueue.main.async {
                 self.clips = []
             }
         }
 
-        // DEFCON 1.2
-        func downloadVideos(presignedUrl: String) {            
-            let url = URL(string: presignedUrl)
-            let request = URLRequest(url: url ?? URL(fileURLWithPath: ""))
-
-            print("Starting GET request to \(String(describing: url))")
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                // data validation
-                guard let data = data, error == nil else {
-                    print("error=\(String(describing: error))")
-                    return
-                }
-                if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                    print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                    self.handleStatusCodeError(statusCode: httpStatus.statusCode)
-                    return
-                }
-                let responseString = String(data: data, encoding: .utf8)
-                print("response = \(String(describing: response))")
-                print("responseString = \(String(describing: responseString))")
-
-                // convert data to zip file
-                let zippedFilePath = NSTemporaryDirectory() + "videos.zip"
-                let zippedFileUrl = URL(fileURLWithPath: zippedFilePath)
-                do {
-                    try data.write(to: zippedFileUrl)
-                } catch {
-                    self.handleGenericError(errorCode: "F1")
-                    return
-                }
-
-                // unzip file
-                let unzippedFilePath = NSTemporaryDirectory() + "videos"
-                self.unzippedFileUrl = URL(fileURLWithPath: unzippedFilePath)
-                self.clearStorage()
-                do {
-                    try SSZipArchive.unzipFile(atPath: zippedFilePath, toDestination: unzippedFilePath, overwrite: true, password: nil)
-                } catch {
-                    self.handleGenericError(errorCode: "F2")
-                    return
-                }
-
-                // delete zipped file
-                let fileManager = FileManager.default
-                do {
-                    try fileManager.removeItem(at: zippedFileUrl)
-                } catch {
-                    print("Error clearing temporary directory")
-                }
-
-                // get names of video files in unzipped folder
-                let enumerator = fileManager.enumerator(atPath: unzippedFilePath)
-                var videoFileNames = [String]()
-                while let element = enumerator?.nextObject() as? String {
-                    videoFileNames.append(element)
-                }
-                print("Video file names: \(videoFileNames)")
-
-                // get list of video URLs
-                var videoUrls = [URL]()
-                for videoFileName in videoFileNames {
-                    let videoFilePath = unzippedFilePath + "/" + videoFileName
-                    let videoFileUrl = URL(fileURLWithPath: videoFilePath)
-                    videoUrls.append(videoFileUrl)
-                }
-                // set clips in alphabetical order
-                videoUrls.sort { $0.lastPathComponent < $1.lastPathComponent }
-                print("Video URLs: \(videoUrls)")
-
-                DispatchQueue.main.async {
-                    // generate clips
-                    for videoUrl in videoUrls {
-                        let thumbnail = Thinger.getThumbnail(url: videoUrl, degreesToRotate: self.videoDegreesToRotate)
-                        // highlight first clip
-                        if self.clips.count == 0 {
-                            self.clips.append(Clip(url: videoUrl, thumbnail: thumbnail, isHighlighted: true))
-                        } else {
-                            self.clips.append(Clip(url: videoUrl, thumbnail: thumbnail, isHighlighted: false))
-                        }
-                    }
-                    self.isLoading = false
-                    self.uploadDisabled = false
-                }
-            }
-            task.resume()
+        struct ClipMetaData: Codable {
+            var code: String
+            var id: String
+            var timestamp: String
         }
 
         // DEFCON 1.1
         // GET request
         // must provide "code" header
-        func getPresignedUrlForDownload() {
-            print("Entered getPresignedUrlForDownload")
+        func downloadExistingThing() {
+            print("Entered downloadExistingThing")
             print("Code: \(self.code)")
+//            self.clearStorage()
 
             // GET request to get presigned URL
             let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething") ?? URL(fileURLWithPath: "")
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
             request.setValue(self.code, forHTTPHeaderField: "code")
+            request.setValue(self.password, forHTTPHeaderField: "password")
 
             print("Starting GET request to \(String(describing: url))")
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -320,15 +240,95 @@ extension ClipsView {
                     return
                 }
                 if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                    print("statusCode should be 200, but is \(httpStatus.statusCode)")
                     self.handleStatusCodeError(statusCode: httpStatus.statusCode)
                     return
                 }
-                let responseString = String(data: data, encoding: .utf8)
                 print("response = \(String(describing: response))")
-                print("responseString = \(String(describing: responseString))")
+
+                // convert JSON
+                print(data)
+                let decoder = JSONDecoder()
+                guard let dataArray = try? decoder.decode([ClipMetaData].self, from: data) else {
+                    print("Failed to decode JSON")
+                    self.handleGenericError(errorCode: "1")
+                    return
+                }
+                print("DownloadResponse: \(dataArray)")
                 
-                self.downloadVideos(presignedUrl: responseString ?? "")
+                // for each id, make a GET request to get the presigned URL
+                for clip in dataArray {
+                    let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething") ?? URL(fileURLWithPath: "")
+                    var request = URLRequest(url: url)
+                    request.httpMethod = "GET"
+                    request.setValue(clip.id, forHTTPHeaderField: "id")
+                    request.setValue(self.password, forHTTPHeaderField: "password")
+
+                    print("Starting GET request to \(String(describing: url))")
+                    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                        // data validation
+                        guard let data = data, error == nil else {
+                            self.handleGenericError(errorCode: "2")
+                            return
+                        }
+                        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                            self.handleStatusCodeError(statusCode: httpStatus.statusCode)
+                            return
+                        }
+                        print("response = \(String(describing: response))")
+                        
+                        // convert data to string to get presigned URL
+                        let presignedUrl = String(data: data, encoding: .utf8)
+                        let url = URL(string: presignedUrl ?? "")
+                        let request = URLRequest(url: url ?? URL(fileURLWithPath: ""))
+
+                        // download from presigned URL
+                        print("Starting GET request to \(String(describing: url))")
+                        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                            // data validation
+                            guard let data = data, error == nil else {
+                                self.handleGenericError(errorCode: "3")
+                                return
+                            }
+                            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                                self.handleStatusCodeError(statusCode: httpStatus.statusCode)
+                                return
+                            }
+
+                            // save data to file in temporary directory
+                            let fileManager = FileManager.default
+                            let tempDirectory = fileManager.temporaryDirectory
+                            let tempFileUrl = tempDirectory.appendingPathComponent(clip.id)
+                            do {
+                                try data.write(to: tempFileUrl)
+                                print("Saved data to \(tempFileUrl)")
+                            } catch {
+                                print("Error saving data to \(tempFileUrl)")
+                                self.handleGenericError(errorCode: "2")
+                                return
+                            }
+
+                            // save url to clips array
+                            DispatchQueue.main.async {
+                                let thumbnail = Thinger.getThumbnail(url: tempFileUrl, degreesToRotate: self.videoDegreesToRotate)
+                                // highlight first clip
+                                if self.clips.count == 0 {
+                                    self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: true))
+                                } else {
+                                    self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false))
+                                }
+                                print("Added clip \(self.clips.count) out of \(dataArray.count)")
+
+                                // if all clips have been downloaded, stop loading
+                                if self.clips.count >= dataArray.count {
+                                    self.isLoading = false
+                                    self.uploadDisabled = false
+                                }
+                            }
+                        }
+                        task.resume()
+                    }
+                    task.resume()
+                }
             }
             task.resume()
         }
@@ -365,7 +365,6 @@ extension ClipsView {
                     return
                 }
                 if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                    print("statusCode should be 200, but is \(httpStatus.statusCode)")
                     self.handleStatusCodeError(statusCode: httpStatus.statusCode)
                     return
                 }
@@ -404,7 +403,6 @@ extension ClipsView {
                     return
                 }
                 if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                    print("statusCode should be 200, but is \(httpStatus.statusCode)")
                     self.handleStatusCodeError(statusCode: httpStatus.statusCode)
                     return
                 }
@@ -419,6 +417,9 @@ extension ClipsView {
         
         // DEFCON 2.0
         func upload(videoUrl: URL) {
+            DispatchQueue.main.async {
+                self.isLoading = true
+            }
             self.getPresignedUrlForUploadToExistingThing(videoUrl: videoUrl)
         }
         

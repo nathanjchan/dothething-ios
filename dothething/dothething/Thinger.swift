@@ -45,7 +45,7 @@ class Thinger {
             let rotatedImage = UIImage(cgImage: thumbnailImage).rotate(radians: Float((Float(degreesToRotate + 180) * .pi / 180)))
             return rotatedImage ?? UIImage(cgImage: thumbnailImage)
         } catch let error {
-            print(error)
+            print("Error creating thumbnail: \(error)")
         }
 
         return UIImage()
