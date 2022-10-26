@@ -9,11 +9,15 @@ import Foundation
 import AVKit
 import SwiftUI
 
+protocol ImagePickerMessenger {
+    func upload(videoUrl: URL)
+}
+
 class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     // initialize with view model
-    var viewModel: ClipsView.ClipsViewModel
-    init(viewModel: ClipsView.ClipsViewModel) {
-        self.viewModel = viewModel
+    var messenger: ImagePickerMessenger
+    init(messenger: ImagePickerMessenger) {
+        self.messenger = messenger
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -26,7 +30,7 @@ class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationContro
             return
         }
         print("Video URL: \(url)")
-        viewModel.upload(videoUrl: url)
+        messenger.upload(videoUrl: url)
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {

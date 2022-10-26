@@ -24,6 +24,22 @@ struct HomeView: View {
             
             Spacer()
 
+            Button(action: {
+                code = ""
+                toggle.toggle()
+            }) {
+                Text("Upload")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(width: 300, height: 50)
+                    .background(Color.accentColor)
+                    .cornerRadius(15.0)
+            }
+
+            Spacer()
+
             HStack {
                 TextField("Enter a code", text: $code)
                     .textFieldStyle(RoundedBorderTextFieldStyle())

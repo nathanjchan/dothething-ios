@@ -83,11 +83,11 @@ struct ClipsView: View {
                 }
             }
             
-            Text("Code: \(code)")
+            Text("Code: \(clipsViewModel.code)")
                 .padding()
                 .onTapGesture {
                     print("Code tapped")
-                    UIPasteboard.general.string = code
+                    UIPasteboard.general.string = clipsViewModel.code
                 }
         }
         .onAppear {
@@ -115,7 +115,7 @@ struct Clip: Hashable {
 }
 
 extension ClipsView {
-    class ClipsViewModel: ObservableObject {
+    class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         @Published var clips: [Clip] = [
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: true),
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false),
@@ -124,11 +124,11 @@ extension ClipsView {
         @Published var shareDisabled = true
         @Published var uploadDisabled = true
         @Published var errorText = ""
+        @Published var code = ""
         
-        private var code = ""
         private var videoDegreesToRotate = -90
         private let password = "ThisIsEpicPassword"
-        private lazy var imagePicker = ImagePicker(viewModel: self)
+        private lazy var imagePicker = ImagePicker(messenger: self)
 
         init() {
             print("Initializing ClipsViewModel")
@@ -141,7 +141,12 @@ extension ClipsView {
         }
 
         func enterCode(code: String) {
-            if self.clips.isEmpty {
+            if code.isEmpty {
+                print("Entered enterCode with empty code")
+                self.code = code
+                self.imagePicker.open()
+            }
+            else if self.clips.isEmpty {
                 print("Entered enterCode with code: \(code)")
                 self.code = code
                 self.downloadExistingThing()
@@ -182,15 +187,11 @@ extension ClipsView {
                 window?.rootViewController?.present(alert, animated: true, completion: nil)
             }
         }
-        
-        private func stopLoadingDueToError(text: String) {
-            DispatchQueue.main.async {
-                self.errorText = text
-            }
-        }
-        
+
         private func handleError(errorCode: String, logMessage: String = "") {
-            self.stopLoadingDueToError(text: "Error Code \(errorCode)")
+            DispatchQueue.main.async {
+                self.errorText = "Error Code \(errorCode)"
+            }
             if !logMessage.isEmpty {
                 print(logMessage)
             }
@@ -324,7 +325,7 @@ extension ClipsView {
         
         // DEFCON 2
         func uploadToExistingThing(videoUrl: URL) {
-            print("Entered getPresignedUrlForUploadToExistingThing")
+            print("Entered ClipsViewModel.uploadToExistingThing")
             print("Code: \(self.code)")
             print("Video URL: \(videoUrl)")
 
@@ -404,13 +405,97 @@ extension ClipsView {
             task.resume()
         }
         
-        // DEFCON 2.0
-        func upload(videoUrl: URL) {
-            self.uploadToExistingThing(videoUrl: videoUrl)
+        // DEFCON 3
+        private func uploadToNewThing(videoUrl: URL) {
+            print("Entered HomeViewModel.uploadToNewThing")
+
+            // get file extension of video
+            let fileExtension = videoUrl.pathExtension.lowercased()
+            print("File extension: \(fileExtension)")
+
+            // POST request to get presigned URL for new thing
+            let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething")
+            guard let url = url else {
+                self.handleError(errorCode: "F1")
+                return
+            }
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue(self.password, forHTTPHeaderField: "password")
+            request.setValue(fileExtension, forHTTPHeaderField: "file-extension")
+
+            print("Starting POST request to \(String(describing: url))")
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                guard let data = data, error == nil else {
+                    self.handleError(errorCode: "F2")
+                    return
+                }
+                if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                    self.handleError(errorCode: "F21-\(httpStatus.statusCode)")
+                    return
+                }
+
+                // convert data to string to get presigned URL
+                let presignedUrl = String(data: data, encoding: .utf8)
+                guard let presignedUrl = presignedUrl else {
+                    self.handleError(errorCode: "F3")
+                    return
+                }
+                print("Response: \(String(describing: response))")
+                print("Presigned URL: \(String(describing: presignedUrl))")
+
+                // parse presigned URL to get code
+                var parsedCode = presignedUrl.components(separatedBy: "/").last!
+                parsedCode = parsedCode.components(separatedBy: "-").first!
+                print("Parsed code: \(parsedCode)")
+
+                // convert NSData to data
+                let videoData = NSData(contentsOf: videoUrl)
+                guard let data = videoData as Data? else {
+                    self.handleError(errorCode: "F4")
+                    return
+                }
+
+                // alert user if video is too large (0.5 GB)
+                if data.count > 536870912 {
+                    self.handleError(errorCode: "FILE_TOO_LARGE")
+                    return
+                }
+
+                let url = URL(string: presignedUrl)
+                guard let url = url else {
+                    self.handleError(errorCode: "E5")
+                    return
+                }
+                var request = URLRequest(url: url)
+                request.httpMethod = "PUT"
+
+                print("Starting PUT request to \(String(describing: url))")
+                let task = URLSession.shared.uploadTask(with: request, from: data) { data, response, error in
+                    if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                        self.handleError(errorCode: "E51-\(httpStatus.statusCode)", logMessage: String(describing: response))
+                        return
+                    }
+                    print("response = \(String(describing: response))")
+
+                    // reload everything (move to clips view)
+                    sleep(3)
+                    self.code = parsedCode
+                    self.clearStorage()
+                    self.downloadExistingThing()
+                }
+                task.resume()
+            }
+            task.resume()
         }
         
-        func getPresignedUrlForUploadToNewThing() {
-            print("Entered getPresignedUrlForUploadToNewThing")
+        // DEFCON 2 OR 3
+        func upload(videoUrl: URL) {
+            if self.code.isEmpty {
+                self.uploadToNewThing(videoUrl: videoUrl)
+            } else {
+                self.uploadToExistingThing(videoUrl: videoUrl)
+            }
         }
 
         // function that will calls an API and returns 
