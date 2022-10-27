@@ -43,6 +43,7 @@ struct HomeView: View {
             HStack {
                 TextField("Enter a code", text: $code)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .font(.title)
                     .onSubmit {
                         toggle.toggle()
                     }
@@ -52,6 +53,7 @@ struct HomeView: View {
                     toggle.toggle()
                 }) {
                     Text("Enter")
+                        .font(.title)
                 }
             }
 

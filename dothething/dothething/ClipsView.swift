@@ -67,20 +67,23 @@ struct ClipsView: View {
                 .opacity(clipsViewModel.shareDisabled ? 0.5 : 1)
             }
 
-            if !clipsViewModel.errorText.isEmpty {
+            if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
                 Text(clipsViewModel.errorText)
                     .padding(.top)
                     .foregroundColor(Color(UIColor.systemGray))
-                Spacer()
-            } else {
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 108, maximum: 108), spacing: 16)]) {
-                        ForEach(clipsViewModel.clips, id: \.self) { clip in
-                            ClipView(clip: clip)
-                        }
+            } else if clipsViewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .padding(.top)
+            }
+            
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 108, maximum: 108), spacing: 16)]) {
+                    ForEach(clipsViewModel.clips, id: \.self) { clip in
+                        ClipView(clip: clip)
                     }
-                    .padding(.top, 4)
                 }
+                .padding(.top, 4)
             }
             
             Text("Code: \(clipsViewModel.code)")
@@ -91,7 +94,12 @@ struct ClipsView: View {
                 }
         }
         .onAppear {
-            clipsViewModel.enterCode(code: code)
+            if code.isEmpty {
+                print("Entered ClipsView with empty code")
+                clipsViewModel.openImagePicker()
+            } else {
+                clipsViewModel.enterCode(code: code)
+            }
         }
     }
 }
@@ -125,7 +133,9 @@ extension ClipsView {
         @Published var uploadDisabled = true
         @Published var errorText = ""
         @Published var code = ""
-        
+        @Published var isLoading = false
+    
+        private var codeInternal = ""
         private var videoDegreesToRotate = -90
         private let password = "ThisIsEpicPassword"
         private lazy var imagePicker = ImagePicker(messenger: self)
@@ -139,15 +149,15 @@ extension ClipsView {
                 self.clips = []
             }
         }
+        
+        func openImagePicker() {
+            self.imagePicker.open()
+        }
 
         func enterCode(code: String) {
-            if code.isEmpty {
-                print("Entered enterCode with empty code")
-                self.code = code
-                self.imagePicker.open()
-            }
-            else if self.clips.isEmpty {
+            if self.clips.isEmpty {
                 print("Entered enterCode with code: \(code)")
+                self.codeInternal = code
                 self.code = code
                 self.downloadExistingThing()
             } else {
@@ -190,6 +200,7 @@ extension ClipsView {
 
         private func handleError(errorCode: String, logMessage: String = "") {
             DispatchQueue.main.async {
+                self.isLoading = false
                 self.errorText = "Error Code \(errorCode)"
             }
             if !logMessage.isEmpty {
@@ -204,17 +215,18 @@ extension ClipsView {
 
         // DEFCON 1
         func downloadExistingThing() {
-            print("Entered downloadExistingThing")
-            print("Code: \(self.code)")
             DispatchQueue.main.async {
+                self.isLoading = true
                 self.uploadDisabled = true
             }
+            print("Entered downloadExistingThing")
+            print("Code: \(self.codeInternal)")
 
             // GET request to get presigned URL
             let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething") ?? URL(fileURLWithPath: "")
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
-            request.setValue(self.code, forHTTPHeaderField: "code")
+            request.setValue(self.codeInternal, forHTTPHeaderField: "code")
             request.setValue(self.password, forHTTPHeaderField: "password")
 
             print("Starting GET request to \(String(describing: url))")
@@ -224,11 +236,11 @@ extension ClipsView {
                     self.handleError(errorCode: "D1")
                     return
                 }
+                print("response = \(String(describing: response))")
                 if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
                     self.handleError(errorCode: "D11-\(httpStatus.statusCode)")
                     return
                 }
-                print("response = \(String(describing: response))")
 
                 // convert JSON
                 print(data)
@@ -248,6 +260,9 @@ extension ClipsView {
                 
                 // for each id, make a GET request to get the presigned URL
                 for clip in dataArray {
+                    // wait for 0.1 seconds to avoid rate limiting
+                    usleep(100000)
+
                     let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething") ?? URL(fileURLWithPath: "")
                     var request = URLRequest(url: url)
                     request.httpMethod = "GET"
@@ -261,11 +276,11 @@ extension ClipsView {
                             self.handleError(errorCode: "D3")
                             return
                         }
+                        print("response = \(String(describing: response))")
                         if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
                             self.handleError(errorCode: "D31-\(httpStatus.statusCode)")
                             return
                         }
-                        print("response = \(String(describing: response))")
                         
                         // convert data to string to get presigned URL
                         let presignedUrl = String(data: data, encoding: .utf8)
@@ -280,6 +295,7 @@ extension ClipsView {
                                 self.handleError(errorCode: "D4")
                                 return
                             }
+                            print("response = \(String(describing: response))")
                             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
                                 self.handleError(errorCode: "D41-\(httpStatus.statusCode)")
                                 return
@@ -312,6 +328,7 @@ extension ClipsView {
                                 // if all clips have been downloaded, stop loading
                                 if self.clips.count >= dataArray.count {
                                     self.uploadDisabled = false
+                                    self.isLoading = false
                                 }
                             }
                         }
@@ -325,8 +342,12 @@ extension ClipsView {
         
         // DEFCON 2
         func uploadToExistingThing(videoUrl: URL) {
+            DispatchQueue.main.async {
+                self.isLoading = true
+                self.uploadDisabled = true
+            }
             print("Entered ClipsViewModel.uploadToExistingThing")
-            print("Code: \(self.code)")
+            print("Code: \(self.codeInternal)")
             print("Video URL: \(videoUrl)")
 
             // get file extension of video
@@ -341,7 +362,7 @@ extension ClipsView {
             }
             var request = URLRequest(url: url)
             request.httpMethod = "PUT"
-            request.setValue(self.code, forHTTPHeaderField: "code")
+            request.setValue(self.codeInternal, forHTTPHeaderField: "code")
             request.setValue(self.password, forHTTPHeaderField: "password")
             request.setValue(fileExtension, forHTTPHeaderField: "file-extension")
 
@@ -396,8 +417,8 @@ extension ClipsView {
                     print("response = \(String(describing: response))")
 
                     // reload everything
-                    sleep(3)
                     self.clearStorage()
+                    sleep(3)
                     self.downloadExistingThing()
                 }
                 task.resume()
@@ -407,6 +428,10 @@ extension ClipsView {
         
         // DEFCON 3
         private func uploadToNewThing(videoUrl: URL) {
+            DispatchQueue.main.async {
+                self.isLoading = true
+                self.uploadDisabled = true
+            }
             print("Entered HomeViewModel.uploadToNewThing")
 
             // get file extension of video
@@ -478,9 +503,12 @@ extension ClipsView {
                     }
                     print("response = \(String(describing: response))")
 
-                    // reload everything (move to clips view)
+                    // reload everything
+                    self.codeInternal = parsedCode
+                    DispatchQueue.main.async {
+                        self.code = parsedCode
+                    }
                     sleep(3)
-                    self.code = parsedCode
                     self.clearStorage()
                     self.downloadExistingThing()
                 }

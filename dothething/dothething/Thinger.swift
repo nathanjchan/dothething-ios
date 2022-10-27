@@ -40,7 +40,7 @@ class Thinger {
 
         do {
             let thumbnailImage = try imageGenerator.copyCGImage(at: CMTimeMake(value: 1, timescale: 60), actualTime: nil)
-
+            
             // rotate image by videoDegreesToRotate
             let rotatedImage = UIImage(cgImage: thumbnailImage).rotate(radians: Float((Float(degreesToRotate + 180) * .pi / 180)))
             return rotatedImage ?? UIImage(cgImage: thumbnailImage)
