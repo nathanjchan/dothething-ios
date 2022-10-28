@@ -19,6 +19,8 @@
 		D89518F929035AEF005AE8BF /* ZipArchive in Frameworks */ = {isa = PBXBuildFile; productRef = D89518F829035AEF005AE8BF /* ZipArchive */; };
 		D89518FB29035EF4005AE8BF /* Thinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89518FA29035EF4005AE8BF /* Thinger.swift */; };
 		D89518FD290522CF005AE8BF /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89518FC290522CF005AE8BF /* ImagePicker.swift */; };
+		D8951904290B6143005AE8BF /* Montserrat in Resources */ = {isa = PBXBuildFile; fileRef = D8951903290B6143005AE8BF /* Montserrat */; };
+		D8951906290BADC0005AE8BF /* KeyboardReadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8951905290BADBF005AE8BF /* KeyboardReadable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,9 @@
 		D87C9297290226B1003275C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D89518FA29035EF4005AE8BF /* Thinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thinger.swift; sourceTree = "<group>"; };
 		D89518FC290522CF005AE8BF /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		D8951902290A8CB7005AE8BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D8951903290B6143005AE8BF /* Montserrat */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Montserrat; path = ../../../../Downloads/Montserrat; sourceTree = "<group>"; };
+		D8951905290BADBF005AE8BF /* KeyboardReadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardReadable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +109,8 @@
 		D87C926A29010F2B003275C1 /* dothething */ = {
 			isa = PBXGroup;
 			children = (
+				D8951903290B6143005AE8BF /* Montserrat */,
+				D8951902290A8CB7005AE8BF /* Info.plist */,
 				D87C926B29010F2C003275C1 /* dothethingApp.swift */,
 				D87C926D29010F2C003275C1 /* HomeView.swift */,
 				D87C926F29010F2D003275C1 /* Assets.xcassets */,
@@ -112,6 +119,7 @@
 				D87C9297290226B1003275C1 /* ContentView.swift */,
 				D89518FA29035EF4005AE8BF /* Thinger.swift */,
 				D89518FC290522CF005AE8BF /* ImagePicker.swift */,
+				D8951905290BADBF005AE8BF /* KeyboardReadable.swift */,
 			);
 			path = dothething;
 			sourceTree = "<group>";
@@ -253,6 +261,7 @@
 			files = (
 				D87C927329010F2D003275C1 /* Preview Assets.xcassets in Resources */,
 				D87C927029010F2D003275C1 /* Assets.xcassets in Resources */,
+				D8951904290B6143005AE8BF /* Montserrat in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +290,7 @@
 				D87C926E29010F2C003275C1 /* HomeView.swift in Sources */,
 				D87C9298290226B1003275C1 /* ContentView.swift in Sources */,
 				D89518FD290522CF005AE8BF /* ImagePicker.swift in Sources */,
+				D8951906290BADC0005AE8BF /* KeyboardReadable.swift in Sources */,
 				D87C926C29010F2C003275C1 /* dothethingApp.swift in Sources */,
 				D89518FB29035EF4005AE8BF /* Thinger.swift in Sources */,
 			);
@@ -444,6 +454,8 @@
 				DEVELOPMENT_TEAM = QQU7STGS9W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = dothething/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to upload your videos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -453,7 +465,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nathanjchan.dothething;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -473,6 +485,8 @@
 				DEVELOPMENT_TEAM = QQU7STGS9W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = dothething/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to upload your videos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -482,7 +496,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nathanjchan.dothething;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

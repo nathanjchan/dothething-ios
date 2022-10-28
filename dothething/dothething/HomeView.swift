@@ -7,56 +7,134 @@
 
 import SwiftUI
 
-struct HomeView: View {
+struct Trapezoid: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY - 93))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + 93))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct Staple: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX + 8, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX + 8, y: rect.minY + 8))
+        path.addLine(to: CGPoint(x: rect.maxX - 8, y: rect.minY + 8))
+        path.addLine(to: CGPoint(x: rect.maxX - 8, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct HomeView: View, KeyboardReadable {
     @ObservedObject private(set) var homeViewModel: HomeViewModel
     @Binding var code: String
     @Binding var toggle: Bool
+    @State private var isKeyboardVisible: Bool = false
 
     var body: some View {
         VStack {
-            Image(systemName: "camera")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Do The Thing")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(.accentColor)
+            ZStack {
+                Trapezoid()
+                    .fill(Color.accentColor)
+                    .frame(width: 341, height: 270)
+                
+                Staple()
+                    .fill(Color.accentColor)
+                    .frame(width: 171, height: 112)
+                    .offset(x: 0, y: -100)
+                
+                Staple()
+                    .fill(Color.accentColor)
+                    .colorInvert()
+                    .frame(width: 171, height: 112)
+                    .offset(x: 0, y: -100)
+                    .mask(Trapezoid().frame(width: 341, height: 270))
+                
+                Staple()
+                    .fill(Color.accentColor)
+                    .frame(width: 171, height: 112)
+                    .rotationEffect(.degrees(180))
+                    .offset(x: 0, y: 100)
+                
+                Staple()
+                    .fill(Color.accentColor)
+                    .colorInvert()
+                    .frame(width: 171, height: 112)
+                    .rotationEffect(.degrees(180))
+                    .offset(x: 0, y: 100)
+                    .mask(Trapezoid().frame(width: 341, height: 270))
+                
+                Text("domino")
+                    .font(.custom("Montserrat-Medium", size: 56, relativeTo: .title))
+                    .foregroundColor(.accentColor)
+                    .colorInvert()
+                    .tracking(16)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.top, 100)
+            .padding(.bottom, 50)
+            .opacity(isKeyboardVisible ? 0 : 1)
             
             Spacer()
-
+            
             Button(action: {
                 code = ""
                 toggle.toggle()
             }) {
-                Text("Upload")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
+                Text("make a domino")
+                    .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                    .foregroundColor(.accentColor)
+                    .colorInvert()
                     .padding()
                     .frame(width: 300, height: 50)
                     .background(Color.accentColor)
-                    .cornerRadius(15.0)
+                    .cornerRadius(50)
             }
-
-            Spacer()
-
-            HStack {
-                TextField("Enter a code", text: $code)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .font(.title)
-                    .onSubmit {
+            .opacity(isKeyboardVisible ? 0 : 1)
+            
+            Text("find a domino:")
+                .font(Font.custom("Montserrat-LightItalic", size: 18, relativeTo: .caption))
+            
+            TextField("enter domino code", text: $code)
+                .font(Font.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                .cornerRadius(50)
+                .frame(width: 300, height: 50)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 50)
+                        .stroke(Color.accentColor, lineWidth: 4)
+                )
+                .multilineTextAlignment(.center)
+                .onSubmit {
+                    if code.count == 7 || code == "dothethingtest" {
                         toggle.toggle()
                     }
-                    .disableAutocorrection(true)
-                    .autocapitalization(.none)
-                Button(action: {
-                    toggle.toggle()
-                }) {
-                    Text("Enter")
-                        .font(.title)
                 }
-            }
-
+                .keyboardType(.alphabet)
+                .disableAutocorrection(true)
+                .autocapitalization(.none)
+                .autocorrectionDisabled()
+                .submitLabel(.search)
+                .onReceive(keyboardPublisher) { newIsKeyboardVisible in
+                    isKeyboardVisible = newIsKeyboardVisible
+                }
+                .padding(.bottom, isKeyboardVisible ? 200 : 0)
+                .toolbar {
+                    ToolbarItem(placement: .keyboard) {
+                        Button("close") {
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        }
+                    }
+                }
         }
         .padding()
     }

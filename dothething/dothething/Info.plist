@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Montserrat/static/Montserrat-Italic.ttf</string>
+		<string>Montserrat/static/Montserrat-Regular.ttf</string>
+		<string>Montserrat/static/Montserrat-Light.ttf</string>
+		<string>Montserrat/static/Montserrat-LightItalic.ttf</string>
+		<string>Montserrat/static/Montserrat-Medium.ttf</string>
+		<string>Montserrat/static/Montserrat-MediumItalic.ttf</string>
+		<string>Montserrat/static/Montserrat-SemiBold.ttf</string>
+		<string>Montserrat/static/Montserrat-SemiBoldItalic.ttf</string>
+	</array>
+</dict>
+</plist>
