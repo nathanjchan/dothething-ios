@@ -101,6 +101,7 @@ struct HomeView: View, KeyboardReadable {
                     .cornerRadius(50)
             }
             .opacity(isKeyboardVisible ? 0 : 1)
+            .padding(.top, 100)
             
             Text("find a domino:")
                 .font(Font.custom("Montserrat-LightItalic", size: 18, relativeTo: .caption))
@@ -127,16 +128,15 @@ struct HomeView: View, KeyboardReadable {
                 .onReceive(keyboardPublisher) { newIsKeyboardVisible in
                     isKeyboardVisible = newIsKeyboardVisible
                 }
-                .padding(.bottom, isKeyboardVisible ? 200 : 0)
+                .padding(.bottom, isKeyboardVisible ? 500 : 100)
                 .toolbar {
-                    ToolbarItem(placement: .keyboard) {
+                    ToolbarItemGroup(placement: .keyboard) {
                         Button("close") {
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                         }
                     }
                 }
         }
-        .padding()
     }
 }
 

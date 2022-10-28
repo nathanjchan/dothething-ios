@@ -44,7 +44,7 @@ struct ClipsView: View {
                     toggle.toggle()
                 }) {
                     Text("Back")
-                }
+                }                                                                                                                                                                                                                                                                                                                                                                                                                                   
                 .padding(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 

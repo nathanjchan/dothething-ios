@@ -14,6 +14,8 @@ protocol ImagePickerMessenger {
 }
 
 class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    private let imagePicker = UIImagePickerController()
+    
     // initialize with view model
     var messenger: ImagePickerMessenger
     init(messenger: ImagePickerMessenger) {
@@ -49,7 +51,6 @@ class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationContro
         print("This device is capable of selecting a video")
 
         // only allow videos to be selected
-        let imagePicker = UIImagePickerController()
         imagePicker.sourceType = .photoLibrary
         imagePicker.mediaTypes = ["public.movie"]
         imagePicker.delegate = self
