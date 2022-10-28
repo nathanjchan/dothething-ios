@@ -12,20 +12,38 @@ struct ClipView: View {
     let clip: Clip
 
     var body: some View {
-        // thumbnail of video
-        Image(uiImage: clip.thumbnail)
-            .resizable()
-            .frame(width: 108, height: 192)
-            .cornerRadius(8)
-            .onTapGesture {
-                print("Tapped \(clip.url)")
-                Thinger.playVideo(videoUrl: clip.url)
+        
+        if clip.thumbnail == UIImage() {
+            
+            ZStack {
+                Rectangle()
+                    .fill(Color.accentColor)
+                    .frame(width: 108, height: 192)
+                
+                Circle()
+                    .fill(Color.accentColor)
+                    .colorInvert()
+                    .frame(width: 36, height: 36)
             }
-        // add a border to the thumbnail
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.red, lineWidth: clip.isHighlighted ? 8 : 0)
-        )
+            .overlay(
+                RoundedRectangle(cornerRadius: 0)
+                    .stroke(Color.red, lineWidth: clip.isHighlighted ? 8 : 0)
+            )
+            
+        } else {
+            Image(uiImage: clip.thumbnail)
+                .resizable()
+                .frame(width: 108, height: 192)
+                .onTapGesture {
+                    print("Tapped \(clip.url)")
+                    Thinger.playVideo(videoUrl: clip.url)
+                }
+            .overlay(
+                RoundedRectangle(cornerRadius: 0)
+                    .stroke(Color.red, lineWidth: clip.isHighlighted ? 8 : 0)
+            )
+        }
+
     }
 }
 
@@ -36,35 +54,26 @@ struct ClipsView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                // back button
-                Button(action: {
-                    print("Back button tapped")
-                    clipsViewModel.backButtonPressed()
-                    toggle.toggle()
-                }) {
-                    Text("Back")
-                }                                                                                                                                                                                                                                                                                                                                                                                                                                   
-                .padding(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ZStack {
+                HStack {
+                    Button(action: {
+                        print("Back button tapped")
+                        clipsViewModel.backButtonPressed()
+                        toggle.toggle()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 24))
+                            .foregroundColor(.accentColor)
+                    }
+                    .padding(.leading)
+                    Spacer()
+                }
                 
-                // upload button
-                Button(action: {
-                    clipsViewModel.uploadButtonPressed()
-                }) {
-                    Text("Upload")
-                }
-                .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
-
-                // share button
-                Button(action: {
-                    clipsViewModel.shareButtonPressed()
-                }) {
-                    Text("Share")
-                }
-                .padding(.trailing)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .opacity(clipsViewModel.shareDisabled ? 0.5 : 1)
+                Text("domino")
+                    .font(.custom("Montserrat-Medium", size: 27))
+                    .foregroundColor(Color.accentColor)
+                    .tracking(8)
+                    .multilineTextAlignment(.center)
             }
 
             if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
@@ -82,16 +91,42 @@ struct ClipsView: View {
                     ForEach(clipsViewModel.clips, id: \.self) { clip in
                         ClipView(clip: clip)
                     }
+                    .padding(.top, 8)
                 }
-                .padding(.top, 4)
             }
             
-            Text("Code: \(clipsViewModel.code)")
-                .padding()
-                .onTapGesture {
-                    print("Code tapped")
-                    UIPasteboard.general.string = clipsViewModel.code
-                }
+            ZStack {
+                Rectangle()
+                    .frame(width: 400, height: 48)
+                    .foregroundColor(.accentColor)
+                
+                Text("code: \(clipsViewModel.code)")
+                    .font(.custom("Montserrat-Light", size: 24))
+                    .foregroundColor(.accentColor)
+                    .colorInvert()
+                    .onTapGesture {
+                        print("Code tapped")
+                        UIPasteboard.general.string = clipsViewModel.code
+                    }
+            }
+
+            // upload button
+            Button(action: {
+                clipsViewModel.uploadButtonPressed()
+            }) {
+                Text("Upload")
+            }
+            .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
+
+            // share button
+            Button(action: {
+                clipsViewModel.shareButtonPressed()
+            }) {
+                Text("Share")
+            }
+            .padding(.trailing)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .opacity(clipsViewModel.shareDisabled ? 0.5 : 1)
         }
         .onAppear {
             if code.isEmpty {
@@ -125,9 +160,12 @@ struct Clip: Hashable {
 extension ClipsView {
     class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         @Published var clips: [Clip] = [
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: true),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false)
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: true),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=sXWjwUl949Y") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=h7MYJghRWt0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=njos57IJf-0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
         ]
         @Published var shareDisabled = true
         @Published var uploadDisabled = true
