@@ -14,8 +14,14 @@ struct ContentView: View {
     var body: some View {
         if showHome {
             HomeView(homeViewModel: HomeView.HomeViewModel(), code: $code, toggle: $showHome)
+                .transition(.move(edge: .leading))
+                .animation(.easeInOut)
+                .transition(.move(edge: .trailing))
         } else {
             ClipsView(clipsViewModel: ClipsView.ClipsViewModel(), code: $code, toggle: $showHome)
+                .transition(.move(edge: .trailing))
+                .animation(.easeInOut)
+                .transition(.move(edge: .leading))
         }
     }
 }

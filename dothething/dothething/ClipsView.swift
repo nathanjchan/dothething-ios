@@ -12,38 +12,19 @@ struct ClipView: View {
     let clip: Clip
 
     var body: some View {
-        
-        if clip.thumbnail == UIImage() {
-            
-            ZStack {
-                Rectangle()
-                    .fill(Color.accentColor)
-                    .frame(width: 108, height: 192)
-                
-                Circle()
-                    .fill(Color.accentColor)
-                    .colorInvert()
-                    .frame(width: 36, height: 36)
+        GeometryReader { geometry in
+            if clip.thumbnail == UIImage() {
+                Image("Placeholder")
+                    .resizable()
+            } else {
+                Image(uiImage: clip.thumbnail)
+                    .resizable()
+                    .onTapGesture {
+                        print("Tapped \(clip.url)")
+                        Thinger.playVideo(videoUrl: clip.url)
+                    }
             }
-            .overlay(
-                RoundedRectangle(cornerRadius: 0)
-                    .stroke(Color.red, lineWidth: clip.isHighlighted ? 8 : 0)
-            )
-            
-        } else {
-            Image(uiImage: clip.thumbnail)
-                .resizable()
-                .frame(width: 108, height: 192)
-                .onTapGesture {
-                    print("Tapped \(clip.url)")
-                    Thinger.playVideo(videoUrl: clip.url)
-                }
-            .overlay(
-                RoundedRectangle(cornerRadius: 0)
-                    .stroke(Color.red, lineWidth: clip.isHighlighted ? 8 : 0)
-            )
         }
-
     }
 }
 
@@ -53,88 +34,101 @@ struct ClipsView: View {
     @Binding var toggle: Bool
     
     var body: some View {
-        VStack {
-            ZStack {
-                HStack {
-                    Button(action: {
-                        print("Back button tapped")
-                        clipsViewModel.backButtonPressed()
-                        toggle.toggle()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 24))
-                            .foregroundColor(.accentColor)
+        GeometryReader { geometry in
+            VStack {
+                ZStack {
+                    HStack {
+                        Button(action: {
+                            print("Back button tapped")
+                            clipsViewModel.backButtonPressed()
+                            toggle.toggle()
+                        }) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 24))
+                                .foregroundColor(.accentColor)
+                        }
+                        .padding(.leading)
+                        Spacer()
                     }
-                    .padding(.leading)
-                    Spacer()
+                    
+                    Text("domino")
+                        .font(.custom("Montserrat-Medium", size: 27))
+                        .foregroundColor(Color.accentColor)
+                        .tracking(8)
+                        .multilineTextAlignment(.center)
                 }
                 
-                Text("domino")
-                    .font(.custom("Montserrat-Medium", size: 27))
-                    .foregroundColor(Color.accentColor)
-                    .tracking(8)
-                    .multilineTextAlignment(.center)
-            }
+                Text("rally")
+                    .font(.custom("Montserrat-Medium", size: 17))
+                    .padding(.bottom)
+                    .tracking(4)
 
-            if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
-                Text(clipsViewModel.errorText)
-                    .padding(.top)
-                    .foregroundColor(Color(UIColor.systemGray))
-            } else if clipsViewModel.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .padding(.top)
-            }
-            
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 108, maximum: 108), spacing: 16)]) {
-                    ForEach(clipsViewModel.clips, id: \.self) { clip in
-                        ClipView(clip: clip)
-                    }
-                    .padding(.top, 8)
+                if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
+                    Text(clipsViewModel.errorText)
+                        .padding(.top)
+                        .foregroundColor(Color(UIColor.systemGray))
+                } else if clipsViewModel.isLoading {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .padding(.top)
                 }
-            }
-            
-            ZStack {
-                Rectangle()
-                    .frame(width: 400, height: 48)
-                    .foregroundColor(.accentColor)
                 
-                Text("code: \(clipsViewModel.code)")
-                    .font(.custom("Montserrat-Light", size: 24))
-                    .foregroundColor(.accentColor)
-                    .colorInvert()
-                    .onTapGesture {
-                        print("Code tapped")
-                        UIPasteboard.general.string = clipsViewModel.code
+                ScrollView {
+                    LazyVGrid(columns: [GridItem](repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
+                        ForEach(clipsViewModel.clips, id: \.self) { clip in
+                            ClipView(clip: clip)
+                        }
+                        .frame(height: (192 / 108) * geometry.size.width / 3)
                     }
-            }
+                    .padding(.leading, 4)
+                    .padding(.trailing, 4)
+                }
+                .padding(.top, -12)
+                .padding(.bottom, -12)
+                
+                ZStack {
+                     Rectangle()
+                        .frame(height: 48)
+                        .foregroundColor(.accentColor)
 
-            // upload button
-            Button(action: {
-                clipsViewModel.uploadButtonPressed()
-            }) {
-                Text("Upload")
+                    Text("code: \(clipsViewModel.code)")
+                        .font(.custom("Montserrat-Light", size: 24))
+                        .foregroundColor(.accentColor)
+                        .colorInvert()
+                        .onTapGesture {
+                            print("Code tapped")
+                            UIPasteboard.general.string = clipsViewModel.code
+                        }
+                }
+                
+                Button(action: {
+                    if clipsViewModel.buttonText == "place a domino" {
+                        clipsViewModel.uploadButtonPressed()
+                    } else if clipsViewModel.buttonText == "share this rally" {
+                        clipsViewModel.shareButtonPressed()
+                    }
+                }) {
+                    Text(clipsViewModel.buttonText)
+                        .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                        .foregroundColor(.accentColor)
+                        .colorInvert()
+                        .padding()
+                        .frame(width: 300, height: 50)
+                        .background(Color.accentColor)
+                        .cornerRadius(50)
+                }
+                .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
+                .padding(.top)
+                .padding(.bottom)
             }
-            .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
-
-            // share button
-            Button(action: {
-                clipsViewModel.shareButtonPressed()
-            }) {
-                Text("Share")
-            }
-            .padding(.trailing)
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .opacity(clipsViewModel.shareDisabled ? 0.5 : 1)
-        }
-        .onAppear {
-            if code.isEmpty {
-                print("Entered ClipsView with empty code")
-                clipsViewModel.openImagePicker()
-            } else {
-                clipsViewModel.enterCode(code: code)
-            }
+            .onAppear {
+                if code.isEmpty {
+                    print("Entered ClipsView with empty code")
+                    clipsViewModel.openImagePicker()
+                } else {
+                    clipsViewModel.enterCode(code: code)
+                }
+            }   
         }
     }
 }
@@ -172,6 +166,7 @@ extension ClipsView {
         @Published var errorText = ""
         @Published var code = ""
         @Published var isLoading = false
+        @Published var buttonText = "place a domino"
     
         private var codeInternal = ""
         private var videoDegreesToRotate = -90
@@ -199,7 +194,7 @@ extension ClipsView {
                 self.code = code
                 self.downloadExistingThing()
             } else {
-                print("Ignoring enterCode because clips is empty")
+                print("Ignoring enterCode because clips is not empty")
             }
         }
         
@@ -432,8 +427,8 @@ extension ClipsView {
                     return
                 }
 
-                // alert user if video is too large (0.5 GB)
-                if data.count > 536870912 {
+                // alert user if video is too large (0.1 GB)
+                if data.count > 100000000 {
                     self.handleError(errorCode: "FILE_TOO_LARGE")
                     return
                 }
@@ -519,8 +514,8 @@ extension ClipsView {
                     return
                 }
 
-                // alert user if video is too large (0.5 GB)
-                if data.count > 536870912 {
+                // alert user if video is too large (0.1 GB)
+                if data.count > 100000000 {
                     self.handleError(errorCode: "FILE_TOO_LARGE")
                     return
                 }
