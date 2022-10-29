@@ -12,20 +12,19 @@ struct ClipView: View {
     let clip: Clip
 
     var body: some View {
-        // thumbnail of video
-        Image(uiImage: clip.thumbnail)
-            .resizable()
-            .frame(width: 108, height: 192)
-            .cornerRadius(8)
-            .onTapGesture {
-                print("Tapped \(clip.url)")
-                Thinger.playVideo(videoUrl: clip.url)
+        GeometryReader { geometry in
+            if clip.thumbnail == UIImage() {
+                Image("Placeholder")
+                    .resizable()
+            } else {
+                Image(uiImage: clip.thumbnail)
+                    .resizable()
+                    .onTapGesture {
+                        print("Tapped \(clip.url)")
+                        Thinger.playVideo(videoUrl: clip.url)
+                    }
             }
-        // add a border to the thumbnail
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.red, lineWidth: clip.isHighlighted ? 8 : 0)
-        )
+        }
     }
 }
 
@@ -35,71 +34,101 @@ struct ClipsView: View {
     @Binding var toggle: Bool
     
     var body: some View {
-        VStack {
-            HStack {
-                // back button
-                Button(action: {
-                    print("Back button tapped")
-                    clipsViewModel.backButtonPressed()
-                    toggle.toggle()
-                }) {
-                    Text("Back")
-                }                                                                                                                                                                                                                                                                                                                                                                                                                                   
-                .padding(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        GeometryReader { geometry in
+            VStack {
+                ZStack {
+                    HStack {
+                        Button(action: {
+                            print("Back button tapped")
+                            clipsViewModel.backButtonPressed()
+                            toggle.toggle()
+                        }) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 24))
+                                .foregroundColor(.accentColor)
+                        }
+                        .padding(.leading)
+                        Spacer()
+                    }
+                    
+                    Text("domino")
+                        .font(.custom("Montserrat-Medium", size: 27))
+                        .foregroundColor(Color.accentColor)
+                        .tracking(8)
+                        .multilineTextAlignment(.center)
+                }
                 
-                // upload button
+                Text("rally")
+                    .font(.custom("Montserrat-Medium", size: 17))
+                    .padding(.bottom)
+                    .tracking(4)
+
+                if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
+                    Text(clipsViewModel.errorText)
+                        .padding(.top)
+                        .foregroundColor(Color(UIColor.systemGray))
+                } else if clipsViewModel.isLoading {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .padding(.top)
+                }
+                
+                ScrollView {
+                    LazyVGrid(columns: [GridItem](repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
+                        ForEach(clipsViewModel.clips, id: \.self) { clip in
+                            ClipView(clip: clip)
+                        }
+                        .frame(height: (192 / 108) * geometry.size.width / 3)
+                    }
+                    .padding(.leading, 4)
+                    .padding(.trailing, 4)
+                }
+                .padding(.top, -12)
+                .padding(.bottom, -12)
+                
+                ZStack {
+                     Rectangle()
+                        .frame(height: 48)
+                        .foregroundColor(.accentColor)
+
+                    Text("code: \(clipsViewModel.code)")
+                        .font(.custom("Montserrat-Light", size: 24))
+                        .foregroundColor(.accentColor)
+                        .colorInvert()
+                        .onTapGesture {
+                            print("Code tapped")
+                            UIPasteboard.general.string = clipsViewModel.code
+                        }
+                }
+                
                 Button(action: {
-                    clipsViewModel.uploadButtonPressed()
+                    if clipsViewModel.buttonText == "place a domino" {
+                        clipsViewModel.uploadButtonPressed()
+                    } else if clipsViewModel.buttonText == "share this rally" {
+                        clipsViewModel.shareButtonPressed()
+                    }
                 }) {
-                    Text("Upload")
+                    Text(clipsViewModel.buttonText)
+                        .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                        .foregroundColor(.accentColor)
+                        .colorInvert()
+                        .padding()
+                        .frame(width: 300, height: 50)
+                        .background(Color.accentColor)
+                        .cornerRadius(50)
                 }
                 .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
-
-                // share button
-                Button(action: {
-                    clipsViewModel.shareButtonPressed()
-                }) {
-                    Text("Share")
+                .padding(.top)
+                .padding(.bottom)
+            }
+            .onAppear {
+                if code.isEmpty {
+                    print("Entered ClipsView with empty code")
+                    clipsViewModel.openImagePicker()
+                } else {
+                    clipsViewModel.enterCode(code: code)
                 }
-                .padding(.trailing)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .opacity(clipsViewModel.shareDisabled ? 0.5 : 1)
-            }
-
-            if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
-                Text(clipsViewModel.errorText)
-                    .padding(.top)
-                    .foregroundColor(Color(UIColor.systemGray))
-            } else if clipsViewModel.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .padding(.top)
-            }
-            
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 108, maximum: 108), spacing: 16)]) {
-                    ForEach(clipsViewModel.clips, id: \.self) { clip in
-                        ClipView(clip: clip)
-                    }
-                }
-                .padding(.top, 4)
-            }
-            
-            Text("Code: \(clipsViewModel.code)")
-                .padding()
-                .onTapGesture {
-                    print("Code tapped")
-                    UIPasteboard.general.string = clipsViewModel.code
-                }
-        }
-        .onAppear {
-            if code.isEmpty {
-                print("Entered ClipsView with empty code")
-                clipsViewModel.openImagePicker()
-            } else {
-                clipsViewModel.enterCode(code: code)
-            }
+            }   
         }
     }
 }
@@ -125,15 +154,19 @@ struct Clip: Hashable {
 extension ClipsView {
     class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         @Published var clips: [Clip] = [
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: true),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(systemName: "film") ?? UIImage(), isHighlighted: false)
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: true),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=sXWjwUl949Y") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=h7MYJghRWt0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=njos57IJf-0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
         ]
         @Published var shareDisabled = true
         @Published var uploadDisabled = true
         @Published var errorText = ""
         @Published var code = ""
         @Published var isLoading = false
+        @Published var buttonText = "place a domino"
     
         private var codeInternal = ""
         private var videoDegreesToRotate = -90
@@ -161,7 +194,7 @@ extension ClipsView {
                 self.code = code
                 self.downloadExistingThing()
             } else {
-                print("Ignoring enterCode because clips is empty")
+                print("Ignoring enterCode because clips is not empty")
             }
         }
         
@@ -394,8 +427,8 @@ extension ClipsView {
                     return
                 }
 
-                // alert user if video is too large (0.5 GB)
-                if data.count > 536870912 {
+                // alert user if video is too large (0.1 GB)
+                if data.count > 100000000 {
                     self.handleError(errorCode: "FILE_TOO_LARGE")
                     return
                 }
@@ -481,8 +514,8 @@ extension ClipsView {
                     return
                 }
 
-                // alert user if video is too large (0.5 GB)
-                if data.count > 536870912 {
+                // alert user if video is too large (0.1 GB)
+                if data.count > 100000000 {
                     self.handleError(errorCode: "FILE_TOO_LARGE")
                     return
                 }

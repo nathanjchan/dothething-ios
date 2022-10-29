@@ -83,15 +83,15 @@ struct HomeView: View, KeyboardReadable {
             }
             .padding(.top, 100)
             .padding(.bottom, 50)
-            .opacity(isKeyboardVisible ? 0 : 1)
+//            .opacity(isKeyboardVisible ? 0 : 1)
             
             Spacer()
-            
+                        
             Button(action: {
                 code = ""
                 toggle.toggle()
             }) {
-                Text("make a domino")
+                Text("start a rally")
                     .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
                     .foregroundColor(.accentColor)
                     .colorInvert()
@@ -100,13 +100,14 @@ struct HomeView: View, KeyboardReadable {
                     .background(Color.accentColor)
                     .cornerRadius(50)
             }
-            .opacity(isKeyboardVisible ? 0 : 1)
-            .padding(.top, 100)
+//            .opacity(isKeyboardVisible ? 0 : 1)
+//            .padding(.top, 100)
+            .padding(.bottom, 8)
             
-            Text("find a domino:")
+            Text("join an existing rally:")
                 .font(Font.custom("Montserrat-LightItalic", size: 18, relativeTo: .caption))
             
-            TextField("enter domino code", text: $code)
+            TextField("enter rally code", text: $code)
                 .font(Font.custom("Montserrat-Light", size: 24, relativeTo: .title))
                 .cornerRadius(50)
                 .frame(width: 300, height: 50)
@@ -128,7 +129,7 @@ struct HomeView: View, KeyboardReadable {
                 .onReceive(keyboardPublisher) { newIsKeyboardVisible in
                     isKeyboardVisible = newIsKeyboardVisible
                 }
-                .padding(.bottom, isKeyboardVisible ? 500 : 100)
+                .padding(.bottom, isKeyboardVisible ? 200 : 100)
                 .toolbar {
                     ToolbarItemGroup(placement: .keyboard) {
                         Button("close") {
