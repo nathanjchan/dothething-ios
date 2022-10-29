@@ -48,6 +48,7 @@ struct ClipsView: View {
                                 .foregroundColor(.accentColor)
                         }
                         .padding(.leading)
+                        .offset(x: 0, y: 16)
                         Spacer()
                     }
                     
@@ -83,16 +84,16 @@ struct ClipsView: View {
                     .padding(.leading, 4)
                     .padding(.trailing, 4)
                 }
-                .padding(.top, -12)
+                .padding(.top, -16)
                 .padding(.bottom, -12)
                 
                 ZStack {
                      Rectangle()
-                        .frame(height: 48)
+                        .frame(height: 40)
                         .foregroundColor(.accentColor)
 
                     Text("code: \(clipsViewModel.code)")
-                        .font(.custom("Montserrat-Light", size: 24))
+                        .font(.custom("Montserrat-Light", size: 20))
                         .foregroundColor(.accentColor)
                         .colorInvert()
                         .onTapGesture {
@@ -118,8 +119,6 @@ struct ClipsView: View {
                         .cornerRadius(50)
                 }
                 .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
-                .padding(.top)
-                .padding(.bottom)
             }
             .onAppear {
                 if code.isEmpty {
