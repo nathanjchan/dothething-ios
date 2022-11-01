@@ -83,7 +83,7 @@ struct HomeView: View, KeyboardReadable {
             }
             .padding(.top, 100)
             .padding(.bottom, 50)
-//            .opacity(isKeyboardVisible ? 0 : 1)
+            .opacity(isKeyboardVisible ? 0 : 1)
             
             Spacer()
                         
@@ -100,8 +100,7 @@ struct HomeView: View, KeyboardReadable {
                     .background(Color.accentColor)
                     .cornerRadius(50)
             }
-//            .opacity(isKeyboardVisible ? 0 : 1)
-//            .padding(.top, 100)
+            .opacity(isKeyboardVisible ? 0 : 1)
             .padding(.bottom, 8)
             
             Text("join an existing rally:")
@@ -129,14 +128,15 @@ struct HomeView: View, KeyboardReadable {
                 .onReceive(keyboardPublisher) { newIsKeyboardVisible in
                     isKeyboardVisible = newIsKeyboardVisible
                 }
-                .padding(.bottom, isKeyboardVisible ? 200 : 100)
-                .toolbar {
-                    ToolbarItemGroup(placement: .keyboard) {
-                        Button("close") {
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                        }
-                    }
+            
+            Text("cancel")
+                .font(Font.custom("Montserrat-LightItalic", size: 18, relativeTo: .caption))
+                .opacity(isKeyboardVisible ? 1 : 0)
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
+                .padding(.bottom, isKeyboardVisible ? 250 : 100)
+                .offset(x: 100)
         }
     }
 }
