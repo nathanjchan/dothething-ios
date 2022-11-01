@@ -21,6 +21,11 @@
 		D89518FD290522CF005AE8BF /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89518FC290522CF005AE8BF /* ImagePicker.swift */; };
 		D8951904290B6143005AE8BF /* Montserrat in Resources */ = {isa = PBXBuildFile; fileRef = D8951903290B6143005AE8BF /* Montserrat */; };
 		D8951906290BADC0005AE8BF /* KeyboardReadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8951905290BADBF005AE8BF /* KeyboardReadable.swift */; };
+		D8E0F2D4290E5A5C001BB23B /* GlobalConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2D3290E5A5C001BB23B /* GlobalConfig.swift */; };
+		D8E0F2D7290E5AC7001BB23B /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = D8E0F2D6290E5AC7001BB23B /* GoogleSignIn */; };
+		D8E0F2D9290E5AC7001BB23B /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D8E0F2D8290E5AC7001BB23B /* GoogleSignInSwift */; };
+		D8E0F2DB290E612E001BB23B /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2DA290E612E001BB23B /* SignInView.swift */; };
+		D8E0F2DE2910F114001BB23B /* AuthentificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2DD2910F114001BB23B /* AuthentificationViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +63,9 @@
 		D8951902290A8CB7005AE8BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D8951903290B6143005AE8BF /* Montserrat */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Montserrat; path = ../../../../Downloads/Montserrat; sourceTree = "<group>"; };
 		D8951905290BADBF005AE8BF /* KeyboardReadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardReadable.swift; sourceTree = "<group>"; };
+		D8E0F2D3290E5A5C001BB23B /* GlobalConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConfig.swift; sourceTree = "<group>"; };
+		D8E0F2DA290E612E001BB23B /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		D8E0F2DD2910F114001BB23B /* AuthentificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthentificationViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +73,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8E0F2D9290E5AC7001BB23B /* GoogleSignInSwift in Frameworks */,
 				D89518F929035AEF005AE8BF /* ZipArchive in Frameworks */,
+				D8E0F2D7290E5AC7001BB23B /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,17 +119,17 @@
 		D87C926A29010F2B003275C1 /* dothething */ = {
 			isa = PBXGroup;
 			children = (
+				D8E0F2DF2910FC12001BB23B /* Views */,
+				D8E0F2DC2910F0FA001BB23B /* ViewModels */,
 				D8951903290B6143005AE8BF /* Montserrat */,
 				D8951902290A8CB7005AE8BF /* Info.plist */,
 				D87C926B29010F2C003275C1 /* dothethingApp.swift */,
-				D87C926D29010F2C003275C1 /* HomeView.swift */,
 				D87C926F29010F2D003275C1 /* Assets.xcassets */,
 				D87C927129010F2D003275C1 /* Preview Content */,
-				D87C929529021E84003275C1 /* ClipsView.swift */,
-				D87C9297290226B1003275C1 /* ContentView.swift */,
 				D89518FA29035EF4005AE8BF /* Thinger.swift */,
 				D89518FC290522CF005AE8BF /* ImagePicker.swift */,
 				D8951905290BADBF005AE8BF /* KeyboardReadable.swift */,
+				D8E0F2D3290E5A5C001BB23B /* GlobalConfig.swift */,
 			);
 			path = dothething;
 			sourceTree = "<group>";
@@ -149,6 +159,25 @@
 			path = dothethingUITests;
 			sourceTree = "<group>";
 		};
+		D8E0F2DC2910F0FA001BB23B /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				D8E0F2DD2910F114001BB23B /* AuthentificationViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		D8E0F2DF2910FC12001BB23B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D87C926D29010F2C003275C1 /* HomeView.swift */,
+				D87C929529021E84003275C1 /* ClipsView.swift */,
+				D87C9297290226B1003275C1 /* ContentView.swift */,
+				D8E0F2DA290E612E001BB23B /* SignInView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -167,6 +196,8 @@
 			name = dothething;
 			packageProductDependencies = (
 				D89518F829035AEF005AE8BF /* ZipArchive */,
+				D8E0F2D6290E5AC7001BB23B /* GoogleSignIn */,
+				D8E0F2D8290E5AC7001BB23B /* GoogleSignInSwift */,
 			);
 			productName = dothething;
 			productReference = D87C926829010F2B003275C1 /* dothething.app */;
@@ -242,6 +273,7 @@
 			mainGroup = D87C925F29010F2B003275C1;
 			packageReferences = (
 				D89518F729035AEF005AE8BF /* XCRemoteSwiftPackageReference "ZipArchive" */,
+				D8E0F2D5290E5AC7001BB23B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			productRefGroup = D87C926929010F2B003275C1 /* Products */;
 			projectDirPath = "";
@@ -286,8 +318,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8E0F2DB290E612E001BB23B /* SignInView.swift in Sources */,
 				D87C929629021E84003275C1 /* ClipsView.swift in Sources */,
 				D87C926E29010F2C003275C1 /* HomeView.swift in Sources */,
+				D8E0F2DE2910F114001BB23B /* AuthentificationViewModel.swift in Sources */,
+				D8E0F2D4290E5A5C001BB23B /* GlobalConfig.swift in Sources */,
 				D87C9298290226B1003275C1 /* ContentView.swift in Sources */,
 				D89518FD290522CF005AE8BF /* ImagePicker.swift in Sources */,
 				D8951906290BADC0005AE8BF /* KeyboardReadable.swift in Sources */,
@@ -455,6 +490,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = dothething/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = domino;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to upload your videos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -466,7 +503,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nathanjchan.dothething;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thedominoapp.domino;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -486,6 +523,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = dothething/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = domino;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to upload your videos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -497,7 +536,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nathanjchan.dothething;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thedominoapp.domino;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -631,6 +670,14 @@
 				kind = branch;
 			};
 		};
+		D8E0F2D5290E5AC7001BB23B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -638,6 +685,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D89518F729035AEF005AE8BF /* XCRemoteSwiftPackageReference "ZipArchive" */;
 			productName = ZipArchive;
+		};
+		D8E0F2D6290E5AC7001BB23B /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8E0F2D5290E5AC7001BB23B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		D8E0F2D8290E5AC7001BB23B /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8E0F2D5290E5AC7001BB23B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
