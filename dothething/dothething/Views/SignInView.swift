@@ -15,6 +15,11 @@ struct SignInView: View {
         GoogleSignInButton(action: authViewModel.handleSignInButton)
             .padding()
             .frame(width: 300)
+            .disabled(authViewModel.isLoading)
+            
+        if authViewModel.isLoading {
+            ProgressView()
+        }
     }
 }
 

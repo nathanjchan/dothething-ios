@@ -36,6 +36,7 @@ struct Staple: Shape {
 }
 
 struct HomeView: View, KeyboardReadable {
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     @ObservedObject private(set) var homeViewModel: HomeViewModel
     @Binding var code: String
     @Binding var toggle: Bool
@@ -86,6 +87,12 @@ struct HomeView: View, KeyboardReadable {
             .opacity(isKeyboardVisible ? 0 : 1)
             
             Spacer()
+
+            Button(action:{
+                authViewModel.handleSignOutButton()
+            }) {
+                Text("sign out")
+            }
                         
             Button(action: {
                 code = ""

@@ -11,11 +11,9 @@ import GoogleSignIn
 class GlobalConfig {
     static let shared = GlobalConfig()
     var signInConfig: GIDConfiguration
-    var emailAddress: String?
-    var fullName: String?
-    var givenName: String?
-    var familyName: String?
-    var profilePicUrl: URL?
+    var googleUser: GIDGoogleUser?
+    var name: String?
+    var profilePicture: URL?
 
     private init() {
         self.signInConfig = GIDConfiguration(clientID: "650326163788-rdn53s1u400dlf9iu0rh82371qnmenvh.apps.googleusercontent.com", serverClientID: "650326163788-pp25kvcqogpssfp108bln1pnhrunhju8.apps.googleusercontent.com")

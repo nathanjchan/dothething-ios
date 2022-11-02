@@ -9,8 +9,10 @@ import GoogleSignIn
 
 class AuthenticationViewModel: ObservableObject {
     @Published var isSignedIn: Bool = false
+    @Published var isLoading: Bool = false
 
     func tokenSignInExample(idToken: String) {
+        self.isLoading = true
         guard let authData = try? JSONEncoder().encode(["idToken": idToken]) else { return }
         let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/googletokensignin")!
         var request = URLRequest(url: url)
@@ -29,19 +31,12 @@ class AuthenticationViewModel: ObservableObject {
                     print("Logged in successfully")
                     DispatchQueue.main.async {
                         self.isSignedIn = true
+                        self.isLoading = false
                     }
                 }
             }
         }
         task.resume()
-    }
-    
-    func loadUserIntoGlobalConfig(user: GIDGoogleUser) {
-        GlobalConfig.shared.emailAddress = user.profile?.email
-        GlobalConfig.shared.fullName = user.profile?.name
-        GlobalConfig.shared.givenName = user.profile?.givenName
-        GlobalConfig.shared.familyName = user.profile?.familyName
-        GlobalConfig.shared.profilePicUrl = user.profile?.imageURL(withDimension: 320)
     }
     
     func handleSignInButton() {
@@ -58,9 +53,10 @@ class AuthenticationViewModel: ObservableObject {
             presenting: rootViewController) { user, error in
                 guard error == nil else { return }
                 guard let user = user else { return }
-                
-                self.loadUserIntoGlobalConfig(user: user)
-                print("Successfully signed in with Google: \(GlobalConfig.shared.emailAddress ?? "no email")")
+                GlobalConfig.shared.googleUser = user
+                GlobalConfig.shared.name = user.profile?.givenName
+                GlobalConfig.shared.profilePicture = user.profile?.imageURL(withDimension: 320)
+                print("Successfully signed in with Google: \(GlobalConfig.shared.name ?? "no name")")
                 
                 user.authentication.do { authentication, error in
                     guard error == nil else { return }
@@ -69,5 +65,11 @@ class AuthenticationViewModel: ObservableObject {
                     self.tokenSignInExample(idToken: idToken)
                 }
             }
+    }
+
+    func handleSignOutButton() {
+        GIDSignIn.sharedInstance.signOut()
+        self.isSignedIn = false
+        print("Successfully signed out")
     }
 }

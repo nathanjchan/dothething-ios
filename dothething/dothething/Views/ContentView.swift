@@ -27,6 +27,9 @@ struct ContentView: View {
             }
         } else {
             SignInView()
+                .transition(.move(edge: .trailing))
+                .animation(.easeInOut)
+                .transition(.move(edge: .leading))
         }
     }
 }
