@@ -121,12 +121,7 @@ struct ClipsView: View {
                 .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
             }
             .onAppear {
-                if code.isEmpty {
-                    print("Entered ClipsView with empty code")
-                    clipsViewModel.openImagePicker()
-                } else {
-                    clipsViewModel.enterCode(code: code)
-                }
+                clipsViewModel.onAppear(code: code)
             }   
         }
     }
@@ -175,6 +170,23 @@ extension ClipsView {
         init() {
             print("Initializing ClipsViewModel")
         }
+
+        func onAppear(code: String) {
+            print("Entered ClipsViewModel onAppear")
+            if code.isEmpty {
+                print("Entered ClipsView onAppear with empty code")
+                clipsViewModel.openImagePicker()
+            } else {
+                if self.clips.isEmpty {
+                    print("Entered ClipsView onAppear with code: \(code)")
+                    self.code = code
+                    self.codeInternal = code
+                    self.downloadExistingThing()
+                } else {
+                    print("Ignoring ClipsView on appear because clips is not empty")
+                }
+            }
+        }
         
         private func clearStorage() {
             DispatchQueue.main.async {
@@ -184,17 +196,6 @@ extension ClipsView {
         
         func openImagePicker() {
             self.imagePicker.open()
-        }
-
-        func enterCode(code: String) {
-            if self.clips.isEmpty {
-                print("Entered enterCode with code: \(code)")
-                self.codeInternal = code
-                self.code = code
-                self.downloadExistingThing()
-            } else {
-                print("Ignoring enterCode because clips is not empty")
-            }
         }
         
         func backButtonPressed() {
@@ -536,6 +537,8 @@ extension ClipsView {
                     print("response = \(String(describing: response))")
 
                     // reload everything
+                    // need to use codeInternal because code needs to be updated in main thread,
+                    // which would prevent the downloadExistingThing() call from working
                     self.codeInternal = parsedCode
                     DispatchQueue.main.async {
                         self.code = parsedCode
