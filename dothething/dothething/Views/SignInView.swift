@@ -16,7 +16,7 @@ struct SignInView: View {
             .padding()
             .frame(width: 300)
             .disabled(authViewModel.isLoading)
-            
+
         if authViewModel.isLoading {
             ProgressView()
         }

@@ -243,6 +243,7 @@ extension ClipsView {
         struct ClipMetaData: Codable {
             var code: String
             var id: String
+            var timeOfCreation: String
         }
 
         // DEFCON 1
@@ -275,7 +276,6 @@ extension ClipsView {
                 }
 
                 // convert JSON
-                print(data)
                 let decoder = JSONDecoder()
                 guard let dataArray = try? decoder.decode([ClipMetaData].self, from: data) else {
                     print("Failed to decode JSON")

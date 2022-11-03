@@ -9,7 +9,12 @@ import GoogleSignIn
 
 class AuthenticationViewModel: ObservableObject {
     @Published var isSignedIn: Bool = false
-    @Published var isLoading: Bool = false
+    @Published var isLoading: Bool = true
+
+    private struct SignInResponse: Codable {
+        var message: String
+        var sessionId: String
+    }
 
     func tokenSignInExample(idToken: String) {
         self.isLoading = true
@@ -29,11 +34,19 @@ class AuthenticationViewModel: ObservableObject {
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 {
                     print("Logged in successfully")
+                    let decoder = JSONDecoder()
+                    if let data = data, let signInResponse = try? decoder.decode(SignInResponse.self, from: data) {
+                        print("sessionId: \(signInResponse.sessionId)")
+                        print("message: \(signInResponse.message)")
+                        GlobalConfig.shared.sessionId = signInResponse.sessionId
+                    }
                     DispatchQueue.main.async {
                         self.isSignedIn = true
-                        self.isLoading = false
                     }
                 }
+            }
+            DispatchQueue.main.async {
+                self.isLoading = false
             }
         }
         task.resume()
