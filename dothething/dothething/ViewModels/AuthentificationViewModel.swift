@@ -29,7 +29,6 @@ class AuthenticationViewModel: ObservableObject {
                 let dataString = String(data: data, encoding: .utf8)
                 print(dataString ?? "no data")
             }
-            print("\(String(describing: response))")
             
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 {

@@ -39,7 +39,7 @@ struct HomeView: View, KeyboardReadable {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     @ObservedObject private(set) var homeViewModel: HomeViewModel
     @Binding var code: String
-    @Binding var toggle: Bool
+    @Binding var currentView: CurrentView
     @State private var isKeyboardVisible: Bool = false
 
     var body: some View {
@@ -88,15 +88,16 @@ struct HomeView: View, KeyboardReadable {
             
             Spacer()
 
-            Button(action:{
-                authViewModel.handleSignOutButton()
+            Button(action: {
+                print("Profile button tapped")
+                currentView = .profile
             }) {
-                Text("sign out")
+                Text("profile")
             }
                         
             Button(action: {
                 code = ""
-                toggle.toggle()
+                currentView = .clips
             }) {
                 Text("start a rally")
                     .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
@@ -124,7 +125,7 @@ struct HomeView: View, KeyboardReadable {
                 .multilineTextAlignment(.center)
                 .onSubmit {
                     if code.count == 7 || code == "dothethingtest" {
-                        toggle.toggle()
+                        currentView = .clips
                     }
                 }
                 .keyboardType(.alphabet)
@@ -150,7 +151,7 @@ struct HomeView: View, KeyboardReadable {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(homeViewModel: HomeView.HomeViewModel(), code: .constant(""), toggle: .constant(true))
+        HomeView(homeViewModel: HomeView.HomeViewModel(), code: .constant(""), currentView: .constant(.home))
     }
 }
 
