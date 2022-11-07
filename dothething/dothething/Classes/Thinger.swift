@@ -33,6 +33,18 @@ extension UIImage {
 }
 
 class Thinger {
+    static func showAlert(title: String, message: String, button: String) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: button, style: .default, handler: nil))
+            
+            let scenes = UIApplication.shared.connectedScenes
+            let windowScene = scenes.first as? UIWindowScene
+            let window = windowScene?.windows.first
+            window?.rootViewController?.present(alert, animated: true, completion: nil)
+        }
+    }
+
     static func getThumbnail(url: URL, degreesToRotate: Int) -> UIImage {
         print("Entered getThumbnail")
         let asset: AVAsset = AVAsset(url: url)
@@ -73,5 +85,16 @@ class Thinger {
                 playerViewController.player!.play()
             }
         }
+    }
+    
+    static func showSharePopup(text: String) {
+        let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let window = windowScene?.windows.first
+        
+        activityViewController.popoverPresentationController?.sourceView = window?.rootViewController?.view
+        window?.rootViewController?.present(activityViewController, animated: true, completion: nil)
     }
 }

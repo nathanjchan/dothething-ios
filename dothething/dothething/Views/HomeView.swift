@@ -7,89 +7,28 @@
 
 import SwiftUI
 
-struct Trapezoid: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.maxY - 93))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + 93))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.closeSubpath()
-        return path
-    }
-}
-
-struct Staple: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX + 8, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX + 8, y: rect.minY + 8))
-        path.addLine(to: CGPoint(x: rect.maxX - 8, y: rect.minY + 8))
-        path.addLine(to: CGPoint(x: rect.maxX - 8, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.closeSubpath()
-        return path
-    }
-}
-
 struct HomeView: View, KeyboardReadable {
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     @ObservedObject private(set) var homeViewModel: HomeViewModel
     @Binding var code: String
-    @Binding var toggle: Bool
+    @Binding var currentView: CurrentView
     @State private var isKeyboardVisible: Bool = false
 
     var body: some View {
         VStack {
-            ZStack {
-                Trapezoid()
-                    .fill(Color.accentColor)
-                    .frame(width: 341, height: 270)
-                
-                Staple()
-                    .fill(Color.accentColor)
-                    .frame(width: 171, height: 112)
-                    .offset(x: 0, y: -100)
-                
-                Staple()
-                    .fill(Color.accentColor)
-                    .colorInvert()
-                    .frame(width: 171, height: 112)
-                    .offset(x: 0, y: -100)
-                    .mask(Trapezoid().frame(width: 341, height: 270))
-                
-                Staple()
-                    .fill(Color.accentColor)
-                    .frame(width: 171, height: 112)
-                    .rotationEffect(.degrees(180))
-                    .offset(x: 0, y: 100)
-                
-                Staple()
-                    .fill(Color.accentColor)
-                    .colorInvert()
-                    .frame(width: 171, height: 112)
-                    .rotationEffect(.degrees(180))
-                    .offset(x: 0, y: 100)
-                    .mask(Trapezoid().frame(width: 341, height: 270))
-                
-                Text("domino")
-                    .font(.custom("Montserrat-Medium", size: 56, relativeTo: .title))
-                    .foregroundColor(.accentColor)
-                    .colorInvert()
-                    .tracking(16)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.top, 100)
-            .padding(.bottom, 50)
-            .opacity(isKeyboardVisible ? 0 : 1)
             
             Spacer()
+
+            Button(action: {
+                print("Profile button tapped")
+                currentView = .profile
+            }) {
+                Text("profile")
+            }
                         
             Button(action: {
                 code = ""
-                toggle.toggle()
+                currentView = .empty
             }) {
                 Text("start a rally")
                     .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
@@ -117,7 +56,7 @@ struct HomeView: View, KeyboardReadable {
                 .multilineTextAlignment(.center)
                 .onSubmit {
                     if code.count == 7 || code == "dothethingtest" {
-                        toggle.toggle()
+                        currentView = .clips
                     }
                 }
                 .keyboardType(.alphabet)
@@ -143,7 +82,7 @@ struct HomeView: View, KeyboardReadable {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(homeViewModel: HomeView.HomeViewModel(), code: .constant(""), toggle: .constant(true))
+        HomeView(homeViewModel: HomeView.HomeViewModel(), code: .constant(""), currentView: .constant(.home))
     }
 }
 
