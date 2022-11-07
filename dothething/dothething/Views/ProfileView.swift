@@ -101,9 +101,6 @@ extension ProfileView {
         }
 
         private func handleError(errorCode: String, logMessage: String = "") {
-            if errorCode == "E21-409" {
-                Thinger.showAlert(title: "You've already uploaded to this cascade!", message: "", button: "OK")
-            }
             DispatchQueue.main.async {
                 self.isLoading = false
                 self.errorText = "Error Code \(errorCode)"
@@ -138,7 +135,7 @@ extension ProfileView {
 
                 // convert JSON
                 let decoder = JSONDecoder()
-                guard let dataArray = try? decoder.decode([ClipMetaData].self, from: data) else {
+                guard let dataArray = try? decoder.decode([ClipMetadata].self, from: data) else {
                     print("Failed to decode JSON")
                     self.handleError(errorCode: "C2")
                     return
@@ -208,7 +205,7 @@ extension ProfileView {
                             // save url to clips array
                             DispatchQueue.main.async {
                                 let thumbnail = Thinger.getThumbnail(url: tempFileUrl, degreesToRotate: self.videoDegreesToRotate)
-                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false))
+                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false, metadata: clip))
                                 print("Added clip \(self.clips.count) out of \(dataArray.count)")
 
                                 // if all clips have been downloaded, stop loading

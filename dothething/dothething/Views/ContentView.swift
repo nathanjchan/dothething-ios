@@ -12,6 +12,7 @@ enum CurrentView {
     case home
     case clips
     case profile
+    case empty
 }
 
 struct ContentView: View {
@@ -34,6 +35,11 @@ struct ContentView: View {
                     .transition(.move(edge: .leading))
             case .profile:
                 ProfileView(profileViewModel: ProfileView.ProfileViewModel(), currentView: $currentView)
+                    .transition(.move(edge: .trailing))
+                    .animation(.easeInOut)
+                    .transition(.move(edge: .leading))
+            case .empty:
+                EmptyView(emptyViewModel: EmptyView.EmptyViewModel(), code: $code, currentView: $currentView)
                     .transition(.move(edge: .trailing))
                     .animation(.easeInOut)
                     .transition(.move(edge: .leading))
@@ -60,6 +66,9 @@ struct ContentView: View {
                                 guard let idToken = authentication.idToken else { return }
                                 authViewModel.tokenSignInExample(idToken: idToken)
                             }
+                        }
+                        DispatchQueue.main.async {
+                            authViewModel.isLoading = false
                         }
                     }
                 }

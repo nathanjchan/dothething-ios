@@ -7,6 +7,26 @@
 
 import SwiftUI
 
+struct ClipMetadata: Codable, Hashable {
+    let code: String
+    let id: String
+    let timeOfCreation: String
+}
+
+struct Clip: Hashable {
+    let url: URL
+    let thumbnail: UIImage
+    let isHighlighted: Bool
+    let metadata: ClipMetadata
+    
+    init(url: URL, thumbnail: UIImage, isHighlighted: Bool, metadata: ClipMetadata) {
+        self.url = url
+        self.thumbnail = thumbnail
+        self.isHighlighted = isHighlighted
+        self.metadata = metadata
+    }
+}
+
 class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     @Published var clips: [Clip] = [
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: true),
@@ -16,13 +36,14 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=h7MYJghRWt0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=njos57IJf-0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
     ]
-    @Published var shareDisabled = true
-    @Published var uploadDisabled = true
+    @Published var uploadEnabled = false
+    @Published var shareEnabled = false
     @Published var errorText = ""
     @Published var code = ""
     @Published var isLoading = false
     @Published var buttonText = "place a domino"
 
+    private var didUpload = true
     private var codeInternal = ""
     private var videoDegreesToRotate = -90
     private lazy var imagePicker = ImagePicker(messenger: self)
@@ -32,20 +53,17 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     }
 
     func onAppear(code: String) {
-        print("Entered ClipsViewModel onAppear")
         if code.isEmpty && self.codeInternal.isEmpty {
             print("Entered ClipsView onAppear with empty code")
-            self.openImagePicker()
-        } else {
-            if self.clips.isEmpty {
-                print("Entered ClipsView onAppear with code: \(code)")
-                self.code = code
-                self.codeInternal = code
-                self.downloadExistingThing()
-            } else {
-                print("Ignoring ClipsView on appear because clips is not empty")
-            }
+            imagePicker.open()
+        } else if self.clips.isEmpty {
+            print("Entered ClipsView.onAppear: code=\(code)")
+            self.code = code
+            self.codeInternal = code
+            self.downloadExistingThing()
+            self.checkIfUserUploadedToCode(code: code)
         }
+        // otherwise ignore this onAppear if clips is not empty
     }
     
     private func clearStorage() {
@@ -54,29 +72,27 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         }
     }
     
-    func openImagePicker() {
-        self.imagePicker.open()
+    func backButtonPressed() {
+        print("Back button pressed")
+        clearStorage()
     }
     
-    func backButtonPressed() {
-        self.clearStorage()
-    }
-
-    func shareButtonPressed() {
-        if shareDisabled && !uploadDisabled {
-            print("Share button disabled")
-            Thinger.showAlert(title: "Share", message: "Please upload your version of The Thing before you share!", button: "OK")
-        }
-        // will return if both are disabled (default state)
-    }
-
     func uploadButtonPressed() {
         print("Upload button pressed")
-        if uploadDisabled {
-            print("Upload button disabled")
-            return
+        if uploadEnabled {
+            imagePicker.open()
+        } else {
+            Thinger.showAlert(title: "You've already uploaded to this cascade!", message: "", button: "OK")
         }
-        self.imagePicker.open()
+    }
+    
+    func shareButtonPressed() {
+        print("Share button pressed")
+        if shareEnabled {
+            Thinger.showSharePopup(text: "I added my domino. Join the rally using code \(codeInternal) on thedominoapp.com!")
+        } else {
+            Thinger.showAlert(title: "Please upload your domino before you share!", message: "", button: "OK")
+        }
     }
 
     private func handleError(errorCode: String, logMessage: String = "") {
@@ -85,18 +101,52 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         }
         DispatchQueue.main.async {
             self.isLoading = false
-            self.uploadDisabled = false
             self.errorText = "Error Code \(errorCode)"
             print("Error Code \(errorCode) \(logMessage)")
+        }
+    }
+    
+    private func startLoading() {
+        DispatchQueue.main.async {
+            self.isLoading = true
+            self.uploadEnabled = false
+            self.shareEnabled = false
+        }
+    }
+    
+    private func stopLoading() {
+        DispatchQueue.main.async {
+            self.isLoading = false
+            if self.didUpload {
+                self.uploadEnabled = false
+                self.shareEnabled = true
+            } else {
+                self.uploadEnabled = true
+                self.shareEnabled = false
+            }
+        }
+    }
+
+    private func checkIfUserUploadedToCode(code: String) {
+        Networker.checkIfUserUploadedToCode(code: code) { didUpload in
+            self.didUpload = didUpload
+            DispatchQueue.main.async {
+                if self.didUpload {
+                    print("User has already uploaded to this code")
+                    self.uploadEnabled = false
+                    self.shareEnabled = true
+                } else {
+                    print("User has not uploaded to this code")
+                    self.uploadEnabled = true
+                    self.shareEnabled = false
+                }
+            }
         }
     }
 
     // DEFCON 1
     func downloadExistingThing() {
-        DispatchQueue.main.async {
-            self.isLoading = true
-            self.uploadDisabled = true
-        }
+        startLoading()
         print("Entered downloadExistingThing")
         print("Code: \(self.codeInternal)")
 
@@ -121,7 +171,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
 
             // convert JSON
             let decoder = JSONDecoder()
-            guard let dataArray = try? decoder.decode([ClipMetaData].self, from: data) else {
+            guard let dataArray = try? decoder.decode([ClipMetadata].self, from: data) else {
                 print("Failed to decode JSON")
                 self.handleError(errorCode: "D2")
                 return
@@ -193,16 +243,15 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
                             let thumbnail = Thinger.getThumbnail(url: tempFileUrl, degreesToRotate: self.videoDegreesToRotate)
                             // highlight first clip
                             if self.clips.count == 0 {
-                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: true))
+                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: true, metadata: clip))
                             } else {
-                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false))
+                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false, metadata: clip))
                             }
                             print("Added clip \(self.clips.count) out of \(dataArray.count)")
 
                             // if all clips have been downloaded, stop loading
                             if self.clips.count >= dataArray.count {
-                                self.uploadDisabled = false
-                                self.isLoading = false
+                                self.stopLoading()
                             }
                         }
                     }
@@ -216,10 +265,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     
     // DEFCON 2
     func uploadToExistingThing(videoUrl: URL) {
-        DispatchQueue.main.async {
-            self.isLoading = true
-            self.uploadDisabled = true
-        }
+        startLoading()
         print("Entered ClipsViewModel.uploadToExistingThing")
         print("Code: \(self.codeInternal)")
         print("Video URL: \(videoUrl)")
@@ -301,10 +347,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     
     // DEFCON 3
     private func uploadToNewThing(videoUrl: URL) {
-        DispatchQueue.main.async {
-            self.isLoading = true
-            self.uploadDisabled = true
-        }
+        startLoading()
         print("Entered HomeViewModel.uploadToNewThing")
 
         // get file extension of video
@@ -398,5 +441,9 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         } else {
             self.uploadToExistingThing(videoUrl: videoUrl)
         }
+    }
+
+    func cancel() {
+        currentView = .home
     }
 }

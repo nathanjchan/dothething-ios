@@ -86,4 +86,15 @@ class Thinger {
             }
         }
     }
+    
+    static func showSharePopup(text: String) {
+        let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let window = windowScene?.windows.first
+        
+        activityViewController.popoverPresentationController?.sourceView = window?.rootViewController?.view
+        window?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+    }
 }

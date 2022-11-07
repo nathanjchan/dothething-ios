@@ -7,25 +7,6 @@
 
 import SwiftUI
 
-struct ClipMetaData: Codable {
-    var code: String
-    var id: String
-    var timeOfCreation: String
-    var accountId: String
-}
-
-struct Clip: Hashable {
-    let url: URL
-    let thumbnail: UIImage
-    let isHighlighted: Bool
-    
-    init(url: URL, thumbnail: UIImage, isHighlighted: Bool) {
-        self.url = url
-        self.thumbnail = thumbnail
-        self.isHighlighted = isHighlighted
-    }
-}
-
 struct ClipView: View {
     let clip: Clip
 
@@ -57,7 +38,6 @@ struct ClipsView: View {
                 ZStack {
                     HStack {
                         Button(action: {
-                            print("Back button tapped")
                             clipsViewModel.backButtonPressed()
                             currentView = .home
                         }) {
@@ -110,33 +90,44 @@ struct ClipsView: View {
                         .frame(height: 40)
                         .foregroundColor(.accentColor)
 
-                    Text("code: \(clipsViewModel.code)")
+                    Text("\(clipsViewModel.code)")
                         .font(.custom("Montserrat-Light", size: 20))
                         .foregroundColor(.accentColor)
                         .colorInvert()
-                        .onTapGesture {
-                            print("Code tapped")
-                            UIPasteboard.general.string = clipsViewModel.code
-                        }
+                        .textSelection(.enabled)
                 }
                 
-                Button(action: {
-                    if clipsViewModel.buttonText == "place a domino" {
+                HStack {
+                    Button(action: {
                         clipsViewModel.uploadButtonPressed()
-                    } else if clipsViewModel.buttonText == "share this rally" {
-                        clipsViewModel.shareButtonPressed()
+                    }) {
+                        Text("upload")
+                            .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                            .foregroundColor(.accentColor)
+                            .colorInvert()
+                            .padding()
+                            .frame(width: 150, height: 50)
+                            .background(Color.accentColor)
+                            .cornerRadius(50)
                     }
-                }) {
-                    Text(clipsViewModel.buttonText)
-                        .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
-                        .foregroundColor(.accentColor)
-                        .colorInvert()
-                        .padding()
-                        .frame(width: 300, height: 50)
-                        .background(Color.accentColor)
-                        .cornerRadius(50)
+                    .opacity(clipsViewModel.uploadEnabled ? 1 : 0.5)
+                    
+                    Button(action: {
+                        clipsViewModel.shareButtonPressed()
+                    }) {
+                        Text("share")
+                            .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                            .foregroundColor(.accentColor)
+                            .colorInvert()
+                            .padding()
+                            .frame(width: 150, height: 50)
+                            .background(Color.accentColor)
+                            .cornerRadius(50)
+                    }
+                    .opacity(clipsViewModel.shareEnabled ? 1 : 0.5)
                 }
-                .opacity(clipsViewModel.uploadDisabled ? 0.5 : 1)
+                
+                
             }
             .onAppear {
                 clipsViewModel.onAppear(code: code)

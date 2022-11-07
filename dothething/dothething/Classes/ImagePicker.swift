@@ -11,6 +11,7 @@ import SwiftUI
 
 protocol ImagePickerMessenger {
     func upload(videoUrl: URL)
+    func cancel()
 }
 
 class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -37,6 +38,7 @@ class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationContro
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         print("Entered imagePickerControllerDidCancel")
+        messenger.cancel()
         picker.dismiss(animated: true, completion: nil)
     }
 
