@@ -444,6 +444,5 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     }
 
     func cancel() {
-        currentView = .home
     }
 }
