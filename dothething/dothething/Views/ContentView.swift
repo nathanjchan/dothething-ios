@@ -46,10 +46,11 @@ struct ContentView: View {
             }
         } else {
             SignInView()
-                .transition(.move(edge: .trailing))
+                .transition(currentView == .home ? .move(edge: .trailing) : .move(edge: .leading))
                 .animation(.easeInOut)
-                .transition(.move(edge: .leading))
+                .transition(currentView == .home ? .move(edge: .leading) : .move(edge: .trailing))
                 .onAppear {
+                    currentView = .home
                     GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
                         if let error = error {
                             print(error.localizedDescription)

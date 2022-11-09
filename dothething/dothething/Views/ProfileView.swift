@@ -46,7 +46,6 @@ struct ProfileView: View {
                     Button(action:{
                         print("Sign out button tapped")
                         authViewModel.handleSignOutButton()
-                        currentView = .home
                     }) {
                         Text("sign out")
                     }
