@@ -348,7 +348,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     // DEFCON 3
     private func uploadToNewThing(videoUrl: URL) {
         startLoading()
-        print("Entered HomeViewModel.uploadToNewThing")
+        print("Entered ClipsViewModel.uploadToNewThing")
 
         // get file extension of video
         let fileExtension = videoUrl.pathExtension.lowercased()

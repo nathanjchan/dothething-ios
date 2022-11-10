@@ -44,7 +44,6 @@ class AuthenticationViewModel: ObservableObject {
                     }
                 }
             }
-            // isLoading = false in 0.5 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.isLoading = false
             }

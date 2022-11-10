@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
-    @ObservedObject private(set) var profileViewModel: ProfileViewModel
+    @EnvironmentObject var profileViewModel: ProfileViewModel
     @Binding var currentView: CurrentView
 
     var body: some View {
@@ -76,7 +76,9 @@ struct ProfileView: View {
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView(profileViewModel: ProfileView.ProfileViewModel(), currentView: .constant(.profile))
+        ProfileView(currentView: .constant(.profile))
+            .environmentObject(AuthenticationViewModel())
+            .environmentObject(ProfileView.ProfileViewModel())
     }
 }
 

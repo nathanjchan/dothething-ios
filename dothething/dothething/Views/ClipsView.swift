@@ -28,40 +28,13 @@ struct ClipView: View {
 }
 
 struct ClipsView: View {
-    @ObservedObject private(set) var clipsViewModel: ClipsViewModel
+    @EnvironmentObject var clipsViewModel: ClipsViewModel
     @Binding var code: String
     @Binding var currentView: CurrentView
     
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                ZStack {
-                    HStack {
-                        Button(action: {
-                            clipsViewModel.backButtonPressed()
-                            currentView = .home
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 24))
-                                .foregroundColor(.accentColor)
-                        }
-                        .padding(.leading)
-                        .offset(x: 0, y: 16)
-                        Spacer()
-                    }
-                    
-                    Text("domino")
-                        .font(.custom("Montserrat-Medium", size: 27))
-                        .foregroundColor(Color.accentColor)
-                        .tracking(8)
-                        .multilineTextAlignment(.center)
-                }
-                
-                Text("rally")
-                    .font(.custom("Montserrat-Medium", size: 17))
-                    .padding(.bottom)
-                    .tracking(4)
-
                 if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
                     Text(clipsViewModel.errorText)
                         .padding(.top)
@@ -82,7 +55,6 @@ struct ClipsView: View {
                     .padding(.leading, 4)
                     .padding(.trailing, 4)
                 }
-                .padding(.top, -16)
                 .padding(.bottom, -12)
                 
                 ZStack {
@@ -138,6 +110,7 @@ struct ClipsView: View {
 
 struct ClipsView_Previews: PreviewProvider {
     static var previews: some View {
-        ClipsView(clipsViewModel: ClipsViewModel(), code: .constant(""), currentView: .constant(.clips))
+        ClipsView(code: .constant("dothethingtest"), currentView: .constant(.clips))
+            .environmentObject(ClipsViewModel())
     }
 }
