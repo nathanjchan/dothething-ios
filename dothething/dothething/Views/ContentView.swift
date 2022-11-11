@@ -20,6 +20,7 @@ struct ContentView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     @StateObject var homeViewModel = HomeView.HomeViewModel()
     @StateObject var profileViewModel = ProfileView.ProfileViewModel()
+    @StateObject var searchViewModel = SearchView.SearchViewModel()
     @State var code: String = ""
     @State var currentView: CurrentView = .home
 
@@ -63,17 +64,16 @@ struct ContentView: View {
             }
             .navigationDestination(isPresented: $authViewModel.isSignedIn) {
                 VStack {
-                    Spacer()
-                    
                     if currentView == .home {
                         HomeView(code: $code, currentView: $currentView)
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(homeViewModel)
                     } else if currentView == .search {
-                        SearchView(code: $code, currentView: $currentView)
+                        SearchView(code: $code)
                             .navigationBarBackButtonHidden(true)
+                            .environmentObject(searchViewModel)
                     } else if currentView == .upload {
-                        UploadView(uploadViewModel: UploadView.UploadViewModel(), code: $code, currentView: $currentView)
+                        UploadView(uploadViewModel: UploadView.UploadViewModel(), code: $code)
                             .navigationBarBackButtonHidden(true)
                     } else if currentView == .profile {
                         ProfileView(currentView: $currentView)

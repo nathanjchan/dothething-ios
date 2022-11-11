@@ -56,10 +56,17 @@ struct SignInView: View {
             
             Spacer()
             
-            GoogleSignInButton(action: authViewModel.handleSignInButton)
-                .padding()
-                .frame(width: 300)
-                .disabled(authViewModel.isLoading)
+            ZStack {
+                // rounded rectangle with black borders
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.accentColor)
+                    .frame(width: 280, height: 50)
+                
+                GoogleSignInButton(action: authViewModel.handleSignInButton)
+                    .padding()
+                    .frame(width: 300)
+                    .disabled(authViewModel.isLoading)
+            }
 
             ProgressView()
                 .opacity(authViewModel.isLoading ? 1 : 0)
