@@ -28,40 +28,18 @@ struct ClipView: View {
 }
 
 struct ClipsView: View {
-    @ObservedObject private(set) var clipsViewModel: ClipsViewModel
+    @EnvironmentObject var clipsViewModel: ClipsViewModel
     @Binding var code: String
-    @Binding var currentView: CurrentView
     
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                ZStack {
-                    HStack {
-                        Button(action: {
-                            clipsViewModel.backButtonPressed()
-                            currentView = .home
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 24))
-                                .foregroundColor(.accentColor)
-                        }
-                        .padding(.leading)
-                        .offset(x: 0, y: 16)
-                        Spacer()
-                    }
-                    
-                    Text("domino")
-                        .font(.custom("Montserrat-Medium", size: 27))
-                        .foregroundColor(Color.accentColor)
-                        .tracking(8)
-                        .multilineTextAlignment(.center)
+                if clipsViewModel.code.isEmpty {
+                    Text("nothing here yet...")
+                        .font(.custom("Montserrat-Italic", size: 24))
+                        .padding()
                 }
                 
-                Text("rally")
-                    .font(.custom("Montserrat-Medium", size: 17))
-                    .padding(.bottom)
-                    .tracking(4)
-
                 if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
                     Text(clipsViewModel.errorText)
                         .padding(.top)
@@ -82,20 +60,20 @@ struct ClipsView: View {
                     .padding(.leading, 4)
                     .padding(.trailing, 4)
                 }
-                .padding(.top, -16)
                 .padding(.bottom, -12)
                 
                 ZStack {
                      Rectangle()
-                        .frame(height: 40)
+                        .frame(height: 36)
                         .foregroundColor(.accentColor)
 
                     Text("\(clipsViewModel.code)")
-                        .font(.custom("Montserrat-Light", size: 20))
+                        .font(.custom("Montserrat-Light", size: 18))
                         .foregroundColor(.accentColor)
                         .colorInvert()
                         .textSelection(.enabled)
                 }
+                .opacity(clipsViewModel.code.isEmpty ? 0 : 1)
                 
                 HStack {
                     Button(action: {
@@ -106,7 +84,7 @@ struct ClipsView: View {
                             .foregroundColor(.accentColor)
                             .colorInvert()
                             .padding()
-                            .frame(width: 150, height: 50)
+                            .frame(width: 150, height: 36)
                             .background(Color.accentColor)
                             .cornerRadius(50)
                     }
@@ -120,12 +98,13 @@ struct ClipsView: View {
                             .foregroundColor(.accentColor)
                             .colorInvert()
                             .padding()
-                            .frame(width: 150, height: 50)
+                            .frame(width: 150, height: 36)
                             .background(Color.accentColor)
                             .cornerRadius(50)
                     }
                     .opacity(clipsViewModel.shareEnabled ? 1 : 0.5)
                 }
+                .opacity(clipsViewModel.code.isEmpty ? 0 : 1)
                 
                 
             }
@@ -138,6 +117,7 @@ struct ClipsView: View {
 
 struct ClipsView_Previews: PreviewProvider {
     static var previews: some View {
-        ClipsView(clipsViewModel: ClipsViewModel(), code: .constant(""), currentView: .constant(.clips))
+        ClipsView(code: .constant("dothethingtest"))
+            .environmentObject(ClipsViewModel())
     }
 }

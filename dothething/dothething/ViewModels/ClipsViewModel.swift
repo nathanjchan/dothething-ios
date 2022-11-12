@@ -56,8 +56,9 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         if code.isEmpty && self.codeInternal.isEmpty {
             print("Entered ClipsView onAppear with empty code")
             imagePicker.open()
-        } else if self.clips.isEmpty {
+        } else if self.clips.isEmpty || self.code != code || self.codeInternal != code {
             print("Entered ClipsView.onAppear: code=\(code)")
+            self.clips = []
             self.code = code
             self.codeInternal = code
             self.downloadExistingThing()
@@ -89,7 +90,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     func shareButtonPressed() {
         print("Share button pressed")
         if shareEnabled {
-            Thinger.showSharePopup(text: "I added my domino. Join the rally using code \(codeInternal) on thedominoapp.com!")
+            Thinger.showSharePopup(text: "I added my domino. Join the cascade with code \(codeInternal) on thedominoapp.com!")
         } else {
             Thinger.showAlert(title: "Please upload your domino before you share!", message: "", button: "OK")
         }
@@ -348,7 +349,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     // DEFCON 3
     private func uploadToNewThing(videoUrl: URL) {
         startLoading()
-        print("Entered HomeViewModel.uploadToNewThing")
+        print("Entered ClipsViewModel.uploadToNewThing")
 
         // get file extension of video
         let fileExtension = videoUrl.pathExtension.lowercased()

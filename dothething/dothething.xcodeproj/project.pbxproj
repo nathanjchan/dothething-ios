@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D800C65D291C8022003790B7 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D800C65C291C8022003790B7 /* SearchView.swift */; };
+		D800C65F291D04F7003790B7 /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D800C65E291D04F7003790B7 /* BottomBarView.swift */; };
 		D87C926C29010F2C003275C1 /* dothethingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C926B29010F2C003275C1 /* dothethingApp.swift */; };
 		D87C926E29010F2C003275C1 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C926D29010F2C003275C1 /* HomeView.swift */; };
 		D87C927029010F2D003275C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D87C926F29010F2D003275C1 /* Assets.xcassets */; };
@@ -19,7 +21,6 @@
 		D89518F929035AEF005AE8BF /* ZipArchive in Frameworks */ = {isa = PBXBuildFile; productRef = D89518F829035AEF005AE8BF /* ZipArchive */; };
 		D89518FB29035EF4005AE8BF /* Thinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89518FA29035EF4005AE8BF /* Thinger.swift */; };
 		D89518FD290522CF005AE8BF /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89518FC290522CF005AE8BF /* ImagePicker.swift */; };
-		D8951904290B6143005AE8BF /* Montserrat in Resources */ = {isa = PBXBuildFile; fileRef = D8951903290B6143005AE8BF /* Montserrat */; };
 		D8951906290BADC0005AE8BF /* KeyboardReadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8951905290BADBF005AE8BF /* KeyboardReadable.swift */; };
 		D8E0F2D4290E5A5C001BB23B /* GlobalConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2D3290E5A5C001BB23B /* GlobalConfig.swift */; };
 		D8E0F2D7290E5AC7001BB23B /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = D8E0F2D6290E5AC7001BB23B /* GoogleSignIn */; };
@@ -30,7 +31,8 @@
 		D8E0F2E32915062E001BB23B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2E22915062E001BB23B /* ProfileView.swift */; };
 		D8E0F2E629173E08001BB23B /* Networker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2E529173E08001BB23B /* Networker.swift */; };
 		D8E0F2E82917AC84001BB23B /* Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2E72917AC84001BB23B /* Shapes.swift */; };
-		D8E0F2EC2917C943001BB23B /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2EB2917C943001BB23B /* EmptyView.swift */; };
+		D8E0F2EC2917C943001BB23B /* UploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0F2EB2917C943001BB23B /* UploadView.swift */; };
+		D8E0F2EE291922F7001BB23B /* Montserrat in Resources */ = {isa = PBXBuildFile; fileRef = D8E0F2ED291922F7001BB23B /* Montserrat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D800C65C291C8022003790B7 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		D800C65E291D04F7003790B7 /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
 		D87C926829010F2B003275C1 /* dothething.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dothething.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D87C926B29010F2C003275C1 /* dothethingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dothethingApp.swift; sourceTree = "<group>"; };
 		D87C926D29010F2C003275C1 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -66,7 +70,6 @@
 		D89518FA29035EF4005AE8BF /* Thinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thinger.swift; sourceTree = "<group>"; };
 		D89518FC290522CF005AE8BF /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		D8951902290A8CB7005AE8BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		D8951903290B6143005AE8BF /* Montserrat */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Montserrat; path = ../../../../Downloads/Montserrat; sourceTree = "<group>"; };
 		D8951905290BADBF005AE8BF /* KeyboardReadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardReadable.swift; sourceTree = "<group>"; };
 		D8E0F2D3290E5A5C001BB23B /* GlobalConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConfig.swift; sourceTree = "<group>"; };
 		D8E0F2DA290E612E001BB23B /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
@@ -75,7 +78,8 @@
 		D8E0F2E22915062E001BB23B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		D8E0F2E529173E08001BB23B /* Networker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networker.swift; sourceTree = "<group>"; };
 		D8E0F2E72917AC84001BB23B /* Shapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shapes.swift; sourceTree = "<group>"; };
-		D8E0F2EB2917C943001BB23B /* EmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
+		D8E0F2EB2917C943001BB23B /* UploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadView.swift; sourceTree = "<group>"; };
+		D8E0F2ED291922F7001BB23B /* Montserrat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = folder; name = Montserrat; path = dothething/Montserrat; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,10 +133,10 @@
 		D87C926A29010F2B003275C1 /* dothething */ = {
 			isa = PBXGroup;
 			children = (
+				D8E0F2ED291922F7001BB23B /* Montserrat */,
 				D8E0F2E429173DBD001BB23B /* Classes */,
 				D8E0F2DF2910FC12001BB23B /* Views */,
 				D8E0F2DC2910F0FA001BB23B /* ViewModels */,
-				D8951903290B6143005AE8BF /* Montserrat */,
 				D8951902290A8CB7005AE8BF /* Info.plist */,
 				D87C926B29010F2C003275C1 /* dothethingApp.swift */,
 				D87C926F29010F2D003275C1 /* Assets.xcassets */,
@@ -183,7 +187,9 @@
 				D87C9297290226B1003275C1 /* ContentView.swift */,
 				D8E0F2DA290E612E001BB23B /* SignInView.swift */,
 				D8E0F2E22915062E001BB23B /* ProfileView.swift */,
-				D8E0F2EB2917C943001BB23B /* EmptyView.swift */,
+				D8E0F2EB2917C943001BB23B /* UploadView.swift */,
+				D800C65C291C8022003790B7 /* SearchView.swift */,
+				D800C65E291D04F7003790B7 /* BottomBarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -316,7 +322,7 @@
 			files = (
 				D87C927329010F2D003275C1 /* Preview Assets.xcassets in Resources */,
 				D87C927029010F2D003275C1 /* Assets.xcassets in Resources */,
-				D8951904290B6143005AE8BF /* Montserrat in Resources */,
+				D8E0F2EE291922F7001BB23B /* Montserrat in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,10 +348,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8E0F2DB290E612E001BB23B /* SignInView.swift in Sources */,
-				D8E0F2EC2917C943001BB23B /* EmptyView.swift in Sources */,
+				D800C65F291D04F7003790B7 /* BottomBarView.swift in Sources */,
+				D8E0F2EC2917C943001BB23B /* UploadView.swift in Sources */,
 				D87C929629021E84003275C1 /* ClipsView.swift in Sources */,
 				D87C926E29010F2C003275C1 /* HomeView.swift in Sources */,
 				D8E0F2E129136954001BB23B /* ClipsViewModel.swift in Sources */,
+				D800C65D291C8022003790B7 /* SearchView.swift in Sources */,
 				D8E0F2E32915062E001BB23B /* ProfileView.swift in Sources */,
 				D8E0F2DE2910F114001BB23B /* AuthentificationViewModel.swift in Sources */,
 				D8E0F2D4290E5A5C001BB23B /* GlobalConfig.swift in Sources */,

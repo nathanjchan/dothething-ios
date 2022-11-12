@@ -12,69 +12,83 @@ enum CurrentView {
     case home
     case clips
     case profile
-    case empty
+    case upload
+    case search
 }
 
 struct ContentView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
+    @StateObject var homeViewModel = HomeView.HomeViewModel()
+    @StateObject var profileViewModel = ProfileView.ProfileViewModel()
+    @StateObject var searchViewModel = SearchView.SearchViewModel()
     @State var code: String = ""
     @State var currentView: CurrentView = .home
 
     var body: some View {
-        if authViewModel.isSignedIn {
-            switch currentView {
-            case .home:
-                HomeView(homeViewModel: HomeView.HomeViewModel(), code: $code, currentView: $currentView)
-                    .transition(.move(edge: .leading))
-                    .animation(.easeInOut)
-                    .transition(.move(edge: .trailing))
-            case .clips:
-                ClipsView(clipsViewModel: ClipsViewModel(), code: $code, currentView: $currentView)
-                    .transition(.move(edge: .trailing))
-                    .animation(.easeInOut)
-                    .transition(.move(edge: .leading))
-            case .profile:
-                ProfileView(profileViewModel: ProfileView.ProfileViewModel(), currentView: $currentView)
-                    .transition(.move(edge: .trailing))
-                    .animation(.easeInOut)
-                    .transition(.move(edge: .leading))
-            case .empty:
-                EmptyView(emptyViewModel: EmptyView.EmptyViewModel(), code: $code, currentView: $currentView)
-                    .transition(.move(edge: .trailing))
-                    .animation(.easeInOut)
-                    .transition(.move(edge: .leading))
-            }
-        } else {
-            SignInView()
-                .transition(.move(edge: .trailing))
-                .animation(.easeInOut)
-                .transition(.move(edge: .leading))
-                .onAppear {
-                    GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-                        if let error = error {
-                            print(error.localizedDescription)
-                        } else {
-                            guard let user = user else { return }
-                            GlobalConfig.shared.googleUser = user
-                            GlobalConfig.shared.name = user.profile?.givenName
-                            GlobalConfig.shared.profilePicture = user.profile?.imageURL(withDimension: 320)
-                            print("Restored sign in with Google: \(GlobalConfig.shared.name ?? "no name")")
-
-                            user.authentication.do { authentication, error in
-                                guard error == nil else { return }
-                                guard let authentication = authentication else { return }
-                                guard let idToken = authentication.idToken else { return }
-                                authViewModel.tokenSignInExample(idToken: idToken)
+        NavigationStack {
+            VStack {
+                SignInView()
+                    .onAppear {
+                        currentView = .home
+                        GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
+                            if let error = error {
+                                print(error.localizedDescription)
+                            } else {
+                                guard let user = user else { return }
+                                GlobalConfig.shared.googleUser = user
+                                GlobalConfig.shared.name = user.profile?.givenName
+                                GlobalConfig.shared.profilePicture = user.profile?.imageURL(withDimension: 320)
+                                print("Restored sign in with Google: \(GlobalConfig.shared.name ?? "no name")")
+                                
+                                user.authentication.do { authentication, error in
+                                    guard error == nil else { return }
+                                    guard let authentication = authentication else { return }
+                                    guard let idToken = authentication.idToken else { return }
+                                    authViewModel.tokenSignInExample(idToken: idToken)
+                                }
+                            }
+                            DispatchQueue.main.async {
+                                authViewModel.isLoading = false
                             }
                         }
+                    }
+                    .onOpenURL { url in
+                        DispatchQueue.main.async {
+                            authViewModel.isLoading = true
+                        }
+                        GIDSignIn.sharedInstance.handle(url)
                         DispatchQueue.main.async {
                             authViewModel.isLoading = false
                         }
                     }
+            }
+            .navigationDestination(isPresented: $authViewModel.isSignedIn) {
+                VStack {
+                    if currentView == .home {
+                        HomeView(code: $code, currentView: $currentView)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(homeViewModel)
+                    } else if currentView == .search {
+                        SearchView(code: $code)
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(searchViewModel)
+                    } else if currentView == .upload {
+                        UploadView(uploadViewModel: UploadView.UploadViewModel(), code: $code)
+                            .navigationBarBackButtonHidden(true)
+                    } else if currentView == .profile {
+                        ProfileView()
+                            .navigationBarBackButtonHidden(true)
+                            .environmentObject(profileViewModel)
+                    }
+
+                    Spacer()
+                    
+                    BottomBarView(currentView: $currentView)
+                        .padding(.top, 4)
+                        .padding(.bottom, 4)
                 }
-                .onOpenURL { url in
-                    GIDSignIn.sharedInstance.handle(url)
-                }
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+            }
         }
     }
 }
@@ -82,5 +96,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .environmentObject(AuthenticationViewModel())
     }
 }
