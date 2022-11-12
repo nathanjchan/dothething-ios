@@ -10,73 +10,112 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     @EnvironmentObject var profileViewModel: ProfileViewModel
-    @Binding var currentView: CurrentView
 
     var body: some View {
         GeometryReader { geometry in
-            VStack {
-                HStack {
-                    Button(action: {
-                        print("Back button tapped")
-                        currentView = .home
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 24))
-                            .foregroundColor(.accentColor)
-                    }
+            NavigationStack {
+                VStack {
+                    
+                    ZStack {
+                        Rectangle()
+                            .frame(height: 20)
+                            .offset(y: -50)
+                        
+                        Rectangle()
+                            .frame(height: 20)
+                            .offset(y: 50)
+                        
+                        HStack {
+                            if let profilePicture = GlobalConfig.shared.profilePicture {
+                                // get image asynchronously
+                                AsyncImage(url: profilePicture) { image in
+                                    image
+                                        .resizable()
+                                        .frame(width: 120, height: 120)
+                                        .clipShape(Circle())
+                                        .overlay(
+                                            Circle()
+                                                .stroke(lineWidth: 6)
+                                                .frame(width: 126, height: 126)
+                                                .colorInvert()
+                                        )
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                            } else {
+                                Circle()
+                                    .frame(width: 120, height: 120)
+                                    .foregroundColor(.gray)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(lineWidth: 6)
+                                            .frame(width: 126, height: 126)
+                                            .colorInvert()
+                                    )
+                            }
+                            
+                            Spacer()
 
-                    if let profilePicture = GlobalConfig.shared.profilePicture {
-                        // get image asynchronously
-                        AsyncImage(url: profilePicture) { image in
-                            image
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .clipShape(Circle())
-                        } placeholder: {
-                            ProgressView()
+                            VStack(alignment: .trailing) {
+                                Text(GlobalConfig.shared.name ?? "No Name")
+
+                                Text("sign out")
+                                    .onTapGesture {
+                                        print("Sign out button pressed")
+                                        authViewModel.handleSignOutButton()
+                                    }
+                            }
+                            .font(.custom("Montserrat-Medium", size: 16))
                         }
-                    } else {
-                        Image(systemName: "person.circle")
-                            .font(.system(size: 50))
-                            .foregroundColor(.accentColor)
+                        .padding(.horizontal, 16)
                     }
 
-                    Text(GlobalConfig.shared.name ?? "no name")
-
-                    Button(action:{
-                        print("Sign out button tapped")
-                        authViewModel.handleSignOutButton()
-                    }) {
-                        Text("sign out")
+                    if profileViewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .padding(.top)
                     }
-                }
 
-                if profileViewModel.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .padding(.top)
-                }
-
-                ScrollView {
-                    LazyVGrid(columns: [GridItem](repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
-                        ForEach(profileViewModel.clips, id: \.self) { clip in
-                            ClipView(clip: clip)
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem](repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
+                            ForEach(profileViewModel.clips, id: \.self) { clip in
+                                ClipView(clip: clip)
+                            }
+                            .frame(height: (192 / 108) * geometry.size.width / 3)
                         }
-                        .frame(height: (192 / 108) * geometry.size.width / 3)
+                        .padding(.leading, 4)
+                        .padding(.trailing, 4)
                     }
-                    .padding(.leading, 4)
-                    .padding(.trailing, 4)
+//                    .padding(.top, -16)
+//                    .padding(.bottom, -12)
                 }
-                .padding(.top, -16)
-                .padding(.bottom, -12)
             }
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    VStack {
+                        Text("domino")
+                            .font(.custom("Montserrat-Medium", size: 20))
+                            .foregroundColor(Color.accentColor)
+                            .tracking(8)
+                        
+                        Text("creator")
+                            .font(.custom("Montserrat-Medium", size: 16))
+                            .foregroundColor(Color.accentColor)
+                            .tracking(4)
+                    }
+                    .offset(x: 4, y: -4)
+                }
+            }
+        }
+        .onAppear {
+            profileViewModel.handleOnAppear()
         }
     }
 }
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView(currentView: .constant(.profile))
+        ProfileView()
             .environmentObject(AuthenticationViewModel())
             .environmentObject(ProfileView.ProfileViewModel())
     }
@@ -98,7 +137,7 @@ extension ProfileView {
         private var videoDegreesToRotate = -90
 
         init() {
-            self.fetchClips()
+            print("Initializing ProfileViewModel")
         }
 
         private func handleError(errorCode: String, logMessage: String = "") {
@@ -106,6 +145,12 @@ extension ProfileView {
                 self.isLoading = false
                 self.errorText = "Error Code \(errorCode)"
                 print("Error Code \(errorCode) \(logMessage)")
+            }
+        }
+        
+        func handleOnAppear() {
+            if clips.isEmpty {
+                fetchClips()
             }
         }
 

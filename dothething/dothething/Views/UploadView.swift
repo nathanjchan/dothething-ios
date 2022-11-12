@@ -16,6 +16,8 @@ struct UploadView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                Spacer()
+                
                 ZStack {
                     Trapezoid()
                         .fill(Color.accentColor)
@@ -53,8 +55,8 @@ struct UploadView: View {
                         .colorInvert()
                         .multilineTextAlignment(.center)
                 }
-                .padding(.top, 50)
-                .padding(.bottom, 150)
+
+                Spacer()
                 
                 Button(action: {
                 }) {
@@ -81,6 +83,8 @@ struct UploadView: View {
                         .background(Color.accentColor)
                         .cornerRadius(50)
                 }
+                
+                Spacer()
             }
         }
         .navigationDestination(isPresented: $showClipsView) {

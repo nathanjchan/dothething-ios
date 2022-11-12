@@ -34,6 +34,12 @@ struct ClipsView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
+                if clipsViewModel.code.isEmpty {
+                    Text("nothing here yet...")
+                        .font(.custom("Montserrat-Italic", size: 24))
+                        .padding()
+                }
+                
                 if !clipsViewModel.errorText.isEmpty && clipsViewModel.clips.isEmpty {
                     Text(clipsViewModel.errorText)
                         .padding(.top)

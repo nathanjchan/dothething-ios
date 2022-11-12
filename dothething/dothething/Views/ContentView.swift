@@ -76,7 +76,7 @@ struct ContentView: View {
                         UploadView(uploadViewModel: UploadView.UploadViewModel(), code: $code)
                             .navigationBarBackButtonHidden(true)
                     } else if currentView == .profile {
-                        ProfileView(currentView: $currentView)
+                        ProfileView()
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(profileViewModel)
                     }
@@ -84,7 +84,7 @@ struct ContentView: View {
                     Spacer()
                     
                     BottomBarView(currentView: $currentView)
-                        .padding(.top, 12)
+                        .padding(.top, 4)
                         .padding(.bottom, 4)
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
