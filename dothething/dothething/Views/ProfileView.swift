@@ -40,7 +40,20 @@ struct ProfileView: View {
                                                 .colorInvert()
                                         )
                                 } placeholder: {
-                                    ProgressView()
+                                    ZStack {
+                                        Circle()
+                                            .frame(width: 120, height: 120)
+                                            .foregroundColor(.gray)
+                                            .overlay(
+                                                Circle()
+                                                    .stroke(lineWidth: 6)
+                                                    .frame(width: 126, height: 126)
+                                                    .colorInvert()
+                                            )
+                                        
+                                        ProgressView()
+                                    }
+                                    
                                 }
                             } else {
                                 Circle()

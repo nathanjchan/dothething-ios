@@ -40,7 +40,7 @@ struct SearchView: View, KeyboardReadable {
                         )
                         .multilineTextAlignment(.center)
                         .onSubmit {
-                            if code.count == 7 || code == "dothethingtest" {
+                            if code.count == 8 || code == "dothethingtest" {
                                 showClipsView = true
                                 searchViewModel.saveCode(code: code)
                             }
