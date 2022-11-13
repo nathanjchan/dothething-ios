@@ -162,7 +162,7 @@ extension ProfileView {
         }
         
         func handleOnAppear() {
-            if clips.isEmpty {
+            if clips.isEmpty && !isLoading {
                 fetchClips()
             }
         }

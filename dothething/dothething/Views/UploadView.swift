@@ -59,8 +59,9 @@ struct UploadView: View {
                 Spacer()
                 
                 Button(action: {
+                    uploadViewModel.openCamera()
                 }) {
-                    Text("start recording")
+                    Text("record a video")
                         .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
                         .foregroundColor(.accentColor)
                         .colorInvert()
@@ -135,10 +136,29 @@ struct UploadView_Previews: PreviewProvider {
 }
 
 extension UploadView {
-    class UploadViewModel: ObservableObject {
+    class UploadViewModel: ObservableObject, ImagePickerMessenger {
+        private lazy var cameraOpener = CameraOpener(messenger: self)
         
         init() {
-            print("UploadViewModel init")
+            print("Intializing UploadViewModel")
+        }
+
+        func openCamera() {
+            print("Entered UploadViewModel.openCamera")
+            cameraOpener.open()
+        }
+        
+        func upload(videoUrl: URL) {
+            // check if video can be saved to photo library
+            if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(videoUrl.path) {
+                // save video to photo library
+                print("Saving video to photo library")
+                UISaveVideoAtPathToSavedPhotosAlbum(videoUrl.path, nil, nil, nil)
+            }
+        }
+        
+        func cancel() {
+            // do nothing
         }
     }
 }
