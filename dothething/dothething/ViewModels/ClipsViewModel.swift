@@ -18,23 +18,25 @@ struct Clip: Hashable {
     let thumbnail: UIImage
     let isHighlighted: Bool
     let metadata: ClipMetadata
+    let showCode: Bool
     
-    init(url: URL, thumbnail: UIImage, isHighlighted: Bool, metadata: ClipMetadata) {
+    init(url: URL, thumbnail: UIImage, isHighlighted: Bool, metadata: ClipMetadata, showCode: Bool) {
         self.url = url
         self.thumbnail = thumbnail
         self.isHighlighted = isHighlighted
         self.metadata = metadata
+        self.showCode = showCode
     }
 }
 
 class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     @Published var clips: [Clip] = [
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: true),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=sXWjwUl949Y") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=h7MYJghRWt0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
-//            Clip(url: URL(string: "https://www.youtube.com/watch?v=njos57IJf-0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: true, showCode: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=sXWjwUl949Y") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=h7MYJghRWt0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: false),
+//            Clip(url: URL(string: "https://www.youtube.com/watch?v=njos57IJf-0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: false),
     ]
     @Published var uploadEnabled = false
     @Published var shareEnabled = false
@@ -244,9 +246,9 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
                             let thumbnail = Thinger.getThumbnail(url: tempFileUrl, degreesToRotate: self.videoDegreesToRotate)
                             // highlight first clip
                             if self.clips.count == 0 {
-                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: true, metadata: clip))
+                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: true, metadata: clip, showCode: false))
                             } else {
-                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false, metadata: clip))
+                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false, metadata: clip, showCode: false))
                             }
                             print("Added clip \(self.clips.count) out of \(dataArray.count)")
 
