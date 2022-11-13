@@ -12,16 +12,30 @@ struct ClipView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            if clip.thumbnail == UIImage() {
-                Image("Placeholder")
-                    .resizable()
-            } else {
-                Image(uiImage: clip.thumbnail)
-                    .resizable()
-                    .onTapGesture {
-                        print("Tapped \(clip.url)")
-                        Thinger.playVideo(videoUrl: clip.url)
-                    }
+            
+            ZStack(alignment: .bottom) {
+                if clip.thumbnail == UIImage() {
+                    Image("Placeholder")
+                        .resizable()
+                } else {
+                    Image(uiImage: clip.thumbnail)
+                        .resizable()
+                        .onTapGesture {
+                            print("Tapped \(clip.url)")
+                            Thinger.playVideo(videoUrl: clip.url)
+                        }
+                }
+                
+                if clip.showCode {
+                    Rectangle()
+                        .frame(height: geometry.size.height / 10)
+                        .opacity(0.5)
+                        .overlay {
+                            Text(clip.metadata.code)
+                                .colorInvert()
+                                .font(.custom("Montserrat-Light", size: 18))
+                        }
+                }
             }
         }
     }
