@@ -9,33 +9,55 @@ import SwiftUI
 
 struct ClipView: View {
     let clip: Clip
+    @State private var showVideoView = false
 
     var body: some View {
         GeometryReader { geometry in
-            
-            ZStack(alignment: .bottom) {
-                if clip.thumbnail == UIImage() {
-                    Image("Placeholder")
-                        .resizable()
-                } else {
-                    Image(uiImage: clip.thumbnail)
-                        .resizable()
-                        .onTapGesture {
-                            print("Tapped \(clip.url)")
-                            Thinger.playVideo(videoUrl: clip.url)
-                        }
+            NavigationStack {
+                ZStack(alignment: .bottom) {
+                    if clip.thumbnail == UIImage() {
+                        Image("Placeholder")
+                            .resizable()
+                    } else {
+                        Image(uiImage: clip.thumbnail)
+                            .resizable()
+                            .onTapGesture {
+                                print("Tapped \(clip.url)")
+    //                            Thinger.playVideo(videoUrl: clip.url)
+                                showVideoView = true
+                            }
+                    }
+                    
+                    if clip.showCode {
+                        Rectangle()
+                            .frame(height: geometry.size.height / 10)
+                            .opacity(0.5)
+                            .overlay {
+                                Text(clip.metadata.code)
+                                    .colorInvert()
+                                    .font(.custom("Montserrat-Light", size: 18))
+                            }
+                    }
                 }
-                
-                if clip.showCode {
-                    Rectangle()
-                        .frame(height: geometry.size.height / 10)
-                        .opacity(0.5)
-                        .overlay {
-                            Text(clip.metadata.code)
-                                .colorInvert()
-                                .font(.custom("Montserrat-Light", size: 18))
+            }
+            .navigationDestination(isPresented: $showVideoView) {
+                VideoView(videoViewModel: VideoView.VideoViewModel(videoUrl: clip.url))
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            VStack {
+                                Text("domino")
+                                    .font(.custom("Montserrat-Medium", size: 20))
+                                    .tracking(8)
+                                
+                                Text("movie")
+                                    .font(.custom("Montserrat-Medium", size: 16))
+                                    .tracking(4)
+                            }
+                            .offset(x: 4, y: -4)
                         }
-                }
+                    }
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarBackground(.visible)
             }
         }
     }
@@ -61,7 +83,8 @@ struct ClipsView: View {
                 } else if clipsViewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(.circular)
-                        .padding(.top)
+                        .padding(.top, 4)
+                        .padding(.bottom, 4)
                 }
                 
                 ScrollView {
