@@ -110,6 +110,12 @@ struct ProfileView: View {
                                                     }
                                                     .offset(x: 4, y: -4)
                                                 }
+                                                ToolbarItem(placement: .navigationBarTrailing) {
+                                                    Text(clip.metadata.code)
+                                                        .font(.custom("Montserrat-Medium", size: 12))
+                                                        .foregroundColor(Color.accentColor)
+                                                        .textSelection(.enabled)
+                                                }
                                             }
                                             .navigationBarTitleDisplayMode(.inline)
                                             .toolbarBackground(.visible)
@@ -209,7 +215,7 @@ extension ProfileView {
                 for cmd in cmdArray {
                     usleep(100000) // 0.1 seconds
                     Networker.downloadThumbnail(urlString: cmd.thumbnailUrl) { thumbnail in
-                        let clip = Clip(thumbnail: thumbnail, isHighlighted: false, metadata: cmd, showCode: false)
+                        let clip = Clip(thumbnail: thumbnail, isHighlighted: false, metadata: cmd, showCode: true)
                         DispatchQueue.main.async {
                             self.clips.append(clip)
                         }

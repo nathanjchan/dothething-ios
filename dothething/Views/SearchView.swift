@@ -95,7 +95,7 @@ struct SearchView: View, KeyboardReadable {
                                 }
                             Spacer()
                             Text(code)
-                                .font(Font.custom("Montserrat-Light", size: 18))
+                                .font(Font.custom("Montserrat-Medium", size: 18))
                                 .foregroundColor(Color.accentColor)
                                 .padding(.bottom, 2)
                             Image(systemName: "chevron.right")

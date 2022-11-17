@@ -81,6 +81,12 @@ struct ClipsView: View {
                                                 }
                                                 .offset(x: 4, y: -4)
                                             }
+                                            ToolbarItem(placement: .navigationBarTrailing) {
+                                                Text(clip.metadata.code)
+                                                    .font(.custom("Montserrat-Medium", size: 12))
+                                                    .foregroundColor(Color.accentColor)
+                                                    .textSelection(.enabled)
+                                            }
                                         }
                                         .navigationBarTitleDisplayMode(.inline)
                                         .toolbarBackground(.visible)
