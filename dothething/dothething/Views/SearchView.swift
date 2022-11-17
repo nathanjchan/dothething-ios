@@ -18,8 +18,9 @@ struct SearchView: View, KeyboardReadable {
         NavigationStack {
             VStack {
                 Text("join an existing cascade:")
-                    .font(Font.custom("Montserrat-LightItalic", size: 18, relativeTo: .caption))
+                    .font(Font.custom("Montserrat-LightItalic", size: 18))
                     .padding(.top, 8)
+                    .padding(.bottom, 8)
                 
                 HStack {
                     Image(systemName: "xmark")
@@ -57,7 +58,7 @@ struct SearchView: View, KeyboardReadable {
                         .padding(.trailing, 8)
                     
                     Image(systemName: "chevron.right")
-                        .font(Font.custom("Montserrat-Light", size: 18, relativeTo: .caption))
+                        .font(Font.custom("Montserrat-Light", size: 18))
                         .foregroundColor(Color.accentColor)
                         .padding(.trailing, 16)
                         .onTapGesture {
@@ -68,31 +69,38 @@ struct SearchView: View, KeyboardReadable {
                         }
                 }
                 .padding(.bottom, 16)
+                
+                Text("previous searches:")
+                    .font(Font.custom("Montserrat-LightItalic", size: 18))
+                    .padding(.bottom, -1)
+                    .opacity(searchViewModel.codes.isEmpty ? 0 : 1)
+
 
                 ScrollView(.vertical, showsIndicators: false) {
                     ForEach(searchViewModel.codes, id: \.self) { code in
                         HStack {
                             Spacer()
-                            
                             Text(code)
-                                .font(Font.custom("Montserrat-Light", size: 18, relativeTo: .caption))
+                                .font(Font.custom("Montserrat-Light", size: 18))
                                 .foregroundColor(Color.accentColor)
-                                                    
+                                .padding(.bottom, 2)
                             Image(systemName: "chevron.right")
-                                .font(Font.custom("Montserrat-Light", size: 18, relativeTo: .caption))
-                                .foregroundColor(Color.accentColor)
+                                .font(Font.custom("Montserrat-Light", size: 18))
+                                .padding(.trailing, 16)
                         }
                         .onTapGesture {
                             self.code = code
                             showClipsView = true
                         }
-                        .padding(.bottom, 4)
-                        .padding(.trailing, 16)
                     }
+                    .padding(.top, 16)
                 }
                 .onTapGesture {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
+                .border(Color.accentColor, width: 4)
+                .padding(.bottom, 8)
+                .padding(.horizontal, 16)
             }
             .navigationDestination(isPresented: $showClipsView) {
                 ClipsView(code: $code)
@@ -147,7 +155,7 @@ struct SearchView_Previews: PreviewProvider {
 
 extension SearchView {
     class SearchViewModel: ObservableObject {
-        @Published var codes: [String] = ["yee", "haw"]
+        @Published var codes: [String] = []
 
         init() {
             print("Initializing SearchViewModel")

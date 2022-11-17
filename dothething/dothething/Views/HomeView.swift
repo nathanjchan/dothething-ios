@@ -13,7 +13,31 @@ struct HomeView: View {
     @Binding var currentView: CurrentView
 
     var body: some View {
-        Text("Home: daily stats, recommended feed")
+        NavigationStack {
+            Spacer()
+            Text("nothing here yet...")
+                .font(.custom("Montserrat-Italic", size: 24))
+                .padding()
+            Spacer()
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                VStack {
+                    Text("domino")
+                        .font(.custom("Montserrat-Medium", size: 20))
+                        .foregroundColor(Color.accentColor)
+                        .tracking(8)
+                    
+                    Text("home")
+                        .font(.custom("Montserrat-Medium", size: 16))
+                        .foregroundColor(Color.accentColor)
+                        .tracking(4)
+                }
+                .offset(x: 4, y: -4)
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible)
     }
 }
 

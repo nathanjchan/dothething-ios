@@ -21,6 +21,11 @@ class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationContro
     var messenger: ImagePickerMessenger
     init(messenger: ImagePickerMessenger) {
         self.messenger = messenger
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.mediaTypes = ["public.movie"]
+        imagePicker.allowsEditing = true
+        imagePicker.videoQuality = .typeHigh
+        imagePicker.videoExportPreset = AVAssetExportPresetHighestQuality
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -44,6 +49,7 @@ class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationContro
 
     func open() {
         print("Entered ImagePicker.open")
+        imagePicker.delegate = self
 
         // verify the device is capable of selecting a video
         guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
@@ -51,14 +57,6 @@ class ImagePicker: NSObject, UIImagePickerControllerDelegate, UINavigationContro
             return
         }
         print("This device is capable of selecting a video")
-
-        // only allow videos to be selected
-        imagePicker.sourceType = .photoLibrary
-        imagePicker.mediaTypes = ["public.movie"]
-        imagePicker.delegate = self
-        imagePicker.allowsEditing = true
-        imagePicker.videoQuality = .typeHigh
-        imagePicker.videoExportPreset = AVAssetExportPresetHighestQuality
 
         // present the image picker
         let scenes = UIApplication.shared.connectedScenes

@@ -58,7 +58,10 @@ extension VideoView {
                 do {
                     try data.write(to: videoUrl)
                     print("Successfully downloaded video")
-                    self.player = AVPlayer(url: videoUrl)
+                    DispatchQueue.main.async {
+                        self.player = AVPlayer(url: videoUrl)
+                        self.player.play()
+                    }
                 } catch {
                     print("Error writing video to temporary directory")
                 }

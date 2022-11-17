@@ -137,6 +137,7 @@ class Networker {
                                 }
                             }
                         }
+                        task.resume()
                     }
                 }
             }
