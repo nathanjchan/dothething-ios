@@ -19,8 +19,7 @@ struct VideoView: View {
                     videoViewModel.player.play()
                 }
                 .onDisappear {
-                    videoViewModel.player.pause()
-                    videoViewModel.player.seek(to: .zero)
+                    videoViewModel.player.replaceCurrentItem(with: nil)
                 }
         }
     }
@@ -41,6 +40,17 @@ extension VideoView {
         init(videoId: String) {
             print("Initializing VideoViewModel: \(videoId)")
             self.videoId = videoId
+            // play sound even when phone muted
+            do {
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            } catch {
+                print("Failed to set audio session category.  Error: \(error)")
+            }
+            // restart video when it ends
+            NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
+                self.player.seek(to: .zero)
+                self.player.play()
+            }
         }
         
         func handleOnAppear() {

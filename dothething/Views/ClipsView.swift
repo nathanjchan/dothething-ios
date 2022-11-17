@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ClipView: View {
     let clip: Clip
-//    @State var showVideoView = false
 
     var body: some View {
         GeometryReader { geometry in
