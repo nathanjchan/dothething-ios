@@ -14,10 +14,12 @@ struct VideoView: View {
     var body: some View {
         ZStack {
             VideoPlayer(player: videoViewModel.player)
-                .onAppear { 
+                .onAppear {
+                    videoViewModel.handleOnAppear()
                     videoViewModel.player.play()
                 }
                 .onDisappear {
+                    videoViewModel.player.pause()
                     videoViewModel.player.seek(to: .zero)
                 }
                     
@@ -42,7 +44,7 @@ struct VideoView: View {
 
 struct VideoView_Previews: PreviewProvider {
     static var previews: some View {
-        VideoView(videoViewModel: VideoView.VideoViewModel(videoUrl: URL(fileURLWithPath: "")))
+        VideoView(videoViewModel: VideoView.VideoViewModel(videoId: "dothethingtest0.mov"))
     }
 }
 
@@ -50,11 +52,38 @@ extension VideoView {
     class VideoViewModel: ObservableObject {
         @Published var player = AVPlayer()
         
-        private var videoUrl: URL
+        private var videoId: String
         
-        init(videoUrl: URL) {
-            self.videoUrl = videoUrl
-            player = AVPlayer(url: videoUrl)
+        init(videoId: String) {
+            print("Initializing VideoViewModel: \(videoId)")
+            self.videoId = videoId
+        }
+        
+        func handleOnAppear() {
+            print("Entered VideoViewModel.handleOnAppear")
+            // TODO: check that the ID is not currently saved to temporary directory
+            // TODO: use Networker to get the presigned URL with video
+            // TODO: use Networker to download video
+            // TODO: save video to temporary directory with id
+
+            let fileManager = FileManager.default
+            let tempDirectory = fileManager.temporaryDirectory
+            let videoUrl = tempDirectory.appendingPathComponent(videoId)
+            if fileManager.fileExists(atPath: videoUrl.path) {
+                print("Video already downloaded")
+                player = AVPlayer(url: videoUrl)
+                return
+            }
+
+            Networker.downloadVideo(id: videoId) { data in
+                do {
+                    try data.write(to: videoUrl)
+                    print("Video downloaded")
+                    self.player = AVPlayer(url: videoUrl)
+                } catch {
+                    print("Error writing video to temporary directory")
+                }
+            }
         }
     }
 }

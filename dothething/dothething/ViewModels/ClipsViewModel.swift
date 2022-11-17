@@ -11,17 +11,16 @@ struct ClipMetadata: Codable, Hashable {
     let code: String
     let id: String
     let timeOfCreation: String
+    let thumbnailUrl: String
 }
 
 struct Clip: Hashable {
-    let url: URL
     let thumbnail: UIImage
     let isHighlighted: Bool
     let metadata: ClipMetadata
     let showCode: Bool
     
-    init(url: URL, thumbnail: UIImage, isHighlighted: Bool, metadata: ClipMetadata, showCode: Bool) {
-        self.url = url
+    init(thumbnail: UIImage, isHighlighted: Bool, metadata: ClipMetadata, showCode: Bool) {
         self.thumbnail = thumbnail
         self.isHighlighted = isHighlighted
         self.metadata = metadata
@@ -103,7 +102,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
             Thinger.showAlert(title: "You've already uploaded to this cascade!", message: "", button: "OK")
         }
         DispatchQueue.main.async {
-            self.isLoading = false
+            self.stopLoading()
             self.errorText = "Error Code \(errorCode)"
             print("Error Code \(errorCode) \(logMessage)")
         }
@@ -149,121 +148,28 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
 
     // DEFCON 1
     func downloadExistingThing() {
-        startLoading()
         print("Entered downloadExistingThing")
-        print("Code: \(self.codeInternal)")
+        print("Code: \(codeInternal)")
+        startLoading()
 
-        // GET request to get presigned URL
-        let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething") ?? URL(fileURLWithPath: "")
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue(self.codeInternal, forHTTPHeaderField: "code")
-        request.setValue(GlobalConfig.shared.password, forHTTPHeaderField: "password")
-
-        print("Starting GET request to \(String(describing: url))")
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            // data validation
-            guard let data = data, error == nil else {
-                self.handleError(errorCode: "D1")
-                return
-            }
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                self.handleError(errorCode: "D11-\(httpStatus.statusCode)")
-                return
-            }
-
-            // convert JSON
-            let decoder = JSONDecoder()
-            guard let dataArray = try? decoder.decode([ClipMetadata].self, from: data) else {
-                print("Failed to decode JSON")
-                self.handleError(errorCode: "D2")
-                return
-            }
-            print("DownloadResponse: \(dataArray)")
-            
-            // handle empty response
-            if dataArray.isEmpty {
+        Networker.downloadExistingThing(code: codeInternal) { cmdArray in // clips metadata array
+            print("Downloaded \(cmdArray.count) clips: \(cmdArray)")
+            if cmdArray.isEmpty {
                 self.handleError(errorCode: "INVALID_CODE")
                 return
-            }
-            
-            // for each id, make a GET request to get the presigned URL
-            for clip in dataArray {
-                // wait for 0.1 seconds to avoid rate limiting
-                usleep(100000)
-
-                let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething") ?? URL(fileURLWithPath: "")
-                var request = URLRequest(url: url)
-                request.httpMethod = "GET"
-                request.setValue(clip.id, forHTTPHeaderField: "id")
-                request.setValue(GlobalConfig.shared.password, forHTTPHeaderField: "password")
-
-                print("Starting GET request to \(String(describing: url))")
-                let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                    // data validation
-                    guard let data = data, error == nil else {
-                        self.handleError(errorCode: "D3")
-                        return
-                    }
-                    if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                        self.handleError(errorCode: "D31-\(httpStatus.statusCode)")
-                        return
-                    }
-                    
-                    // convert data to string to get presigned URL
-                    let presignedUrl = String(data: data, encoding: .utf8)
-                    let url = URL(string: presignedUrl ?? "")
-                    let request = URLRequest(url: url ?? URL(fileURLWithPath: ""))
-
-                    // download from presigned URL
-                    print("Starting GET request to \(String(describing: url))")
-                    let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                        // data validation
-                        guard let data = data, error == nil else {
-                            self.handleError(errorCode: "D4")
-                            return
-                        }
-                        if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                            self.handleError(errorCode: "D41-\(httpStatus.statusCode)")
-                            return
-                        }
-
-                        // save data to file in temporary directory
-                        let fileManager = FileManager.default
-                        let tempDirectory = fileManager.temporaryDirectory
-                        let tempFileUrl = tempDirectory.appendingPathComponent(clip.id)
-                        do {
-                            try data.write(to: tempFileUrl)
-                            print("Saved data to \(tempFileUrl)")
-                        } catch {
-                            print("Error saving data to \(tempFileUrl)")
-                            self.handleError(errorCode: "D5")
-                            return
-                        }
-
-                        // save url to clips array
+            } else {
+                for cmd in cmdArray {
+                    usleep(100000) // 0.1 seconds
+                    Networker.downloadThumbnail(urlString: cmd.thumbnailUrl) { thumbnail in
+                        let clip = Clip(thumbnail: thumbnail, isHighlighted: false, metadata: cmd, showCode: false)
                         DispatchQueue.main.async {
-                            let thumbnail = Thinger.getThumbnail(url: tempFileUrl, degreesToRotate: self.videoDegreesToRotate)
-                            // highlight first clip
-                            if self.clips.count == 0 {
-                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: true, metadata: clip, showCode: false))
-                            } else {
-                                self.clips.append(Clip(url: tempFileUrl, thumbnail: thumbnail, isHighlighted: false, metadata: clip, showCode: false))
-                            }
-                            print("Added clip \(self.clips.count) out of \(dataArray.count)")
-
-                            // if all clips have been downloaded, stop loading
-                            if self.clips.count >= dataArray.count {
-                                self.stopLoading()
-                            }
+                            self.clips.append(clip)
                         }
+                        self.stopLoading()
                     }
-                    task.resume()
                 }
-                task.resume()
             }
         }
-        task.resume()
     }
     
     // DEFCON 2

@@ -13,7 +13,7 @@ struct HomeView: View {
     @Binding var currentView: CurrentView
 
     var body: some View {
-        Text("HomeView: stats, have a feed eventually")
+        Text("Home: daily stats, recommended feed")
     }
 }
 
