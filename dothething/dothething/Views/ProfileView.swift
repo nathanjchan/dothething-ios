@@ -95,6 +95,24 @@ struct ProfileView: View {
                                 ForEach(profileViewModel.clips, id: \.self) { clip in
                                     NavigationLink {
                                         VideoView(videoViewModel: VideoView.VideoViewModel(videoId: clip.metadata.id))
+                                            .toolbar {
+                                                ToolbarItem(placement: .principal) {
+                                                    VStack {
+                                                        Text("domino")
+                                                            .font(.custom("Montserrat-Medium", size: 20))
+                                                            .foregroundColor(Color.accentColor)
+                                                            .tracking(8)
+                                                        
+                                                        Text("movie")
+                                                            .font(.custom("Montserrat-Medium", size: 16))
+                                                            .foregroundColor(Color.accentColor)
+                                                            .tracking(4)
+                                                    }
+                                                    .offset(x: 4, y: -4)
+                                                }
+                                            }
+                                            .navigationBarTitleDisplayMode(.inline)
+                                            .toolbarBackground(.visible)
                                     } label: {
                                         ClipView(clip: clip)
 
