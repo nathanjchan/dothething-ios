@@ -171,6 +171,13 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
             }
         }
     }
+
+    func refresh() {
+        print("Entered ClipsViewModel.refresh")
+        clearStorage()
+        downloadExistingThing()
+        checkIfUserUploadedToCode(code: codeInternal)
+    }
     
     // DEFCON 2
     func uploadToExistingThing(videoUrl: URL) {

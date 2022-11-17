@@ -120,6 +120,15 @@ struct SearchView: View, KeyboardReadable {
                             }
                             .offset(x: 4, y: -4)
                         }
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: {
+                                clipsViewModel.refresh()
+                            }) {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(Font.custom("Montserrat-Light", size: 16))
+                                    .foregroundColor(Color.accentColor)
+                            }
+                        }
                     }
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbarBackground(.visible)

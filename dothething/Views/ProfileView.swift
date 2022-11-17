@@ -143,6 +143,15 @@ struct ProfileView: View {
                     }
                     .offset(x: 4, y: -4)
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        profileViewModel.refresh()
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(Font.custom("Montserrat-Light", size: 16))
+                            .foregroundColor(Color.accentColor)
+                    }
+                }
             }
         }
         .onAppear {
@@ -208,6 +217,13 @@ extension ProfileView {
                     }
                 }
             }
-        }   
+        }
+
+        func refresh() {
+            DispatchQueue.main.async {
+                self.clips = []
+            }
+            fetchClips()
+        }
     }
 }
