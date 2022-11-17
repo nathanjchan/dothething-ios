@@ -24,7 +24,7 @@ struct SearchView: View, KeyboardReadable {
                 
                 HStack {
                     Image(systemName: "xmark")
-                        .font(Font.custom("Montserrat-Light", size: 18, relativeTo: .caption))
+                        .font(Font.custom("Montserrat-Light", size: 18))
                         .foregroundColor(Color.accentColor)
                         .padding(.leading, 16)
                         .onTapGesture {
@@ -32,7 +32,7 @@ struct SearchView: View, KeyboardReadable {
                         }
                     
                     TextField("enter cascade code", text: $code)
-                        .font(Font.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                        .font(Font.custom("Montserrat-Medium", size: 24))
                         .cornerRadius(50)
                         .frame(height: 50)
                         .overlay(
@@ -69,16 +69,30 @@ struct SearchView: View, KeyboardReadable {
                         }
                 }
                 .padding(.bottom, 16)
+
+                if searchViewModel.codes.isEmpty {
+                    Rectangle()
+                        .colorInvert()
+                        .onTapGesture {
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        }
+                }
                 
                 Text("previous searches:")
                     .font(Font.custom("Montserrat-LightItalic", size: 18))
                     .padding(.bottom, -1)
                     .opacity(searchViewModel.codes.isEmpty ? 0 : 1)
 
-
                 ScrollView(.vertical, showsIndicators: false) {
                     ForEach(searchViewModel.codes, id: \.self) { code in
                         HStack {
+                            Image(systemName: "xmark")
+                                .font(Font.custom("Montserrat-Light", size: 18))
+                                .foregroundColor(Color.accentColor)
+                                .padding(.leading, 16)
+                                .onTapGesture {
+                                    searchViewModel.deleteCode(code: code)
+                                }
                             Spacer()
                             Text(code)
                                 .font(Font.custom("Montserrat-Light", size: 18))
@@ -95,12 +109,12 @@ struct SearchView: View, KeyboardReadable {
                     }
                     .padding(.top, 16)
                 }
-                .onTapGesture {
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                }
                 .border(Color.accentColor, width: 4)
                 .padding(.bottom, 8)
                 .padding(.horizontal, 16)
+            }
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             }
             .navigationDestination(isPresented: $showClipsView) {
                 ClipsView(code: $code)
@@ -178,10 +192,18 @@ extension SearchView {
         func saveCode(code: String) {
             print("Saving code: \(code)")
             // delete code if it already exists and add it to the front of the array
+            codes.removeAll(where: { $0 == code })
+            codes.insert(code, at: 0)
+
+            // save the array to user defaults
+            UserDefaults.standard.set(codes, forKey: "codes")
+        }
+
+        func deleteCode(code: String) {
+            print("Deleting code: \(code)")
             if let index = codes.firstIndex(of: code) {
                 codes.remove(at: index)
             }
-            codes.insert(code, at: 0)
 
             // save the array to user defaults
             UserDefaults.standard.set(codes, forKey: "codes")
