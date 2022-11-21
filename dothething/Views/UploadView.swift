@@ -62,7 +62,7 @@ struct UploadView: View {
                     uploadViewModel.openCamera()
                 }) {
                     Text("record a video")
-                        .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                        .font(.custom("Montserrat-Medium", size: 24, relativeTo: .title))
                         .foregroundColor(.accentColor)
                         .colorInvert()
                         .padding()
@@ -76,7 +76,7 @@ struct UploadView: View {
                     showClipsView = true
                 }) {
                     Text("upload from gallery")
-                        .font(.custom("Montserrat-Light", size: 24, relativeTo: .title))
+                        .font(.custom("Montserrat-Medium", size: 24, relativeTo: .title))
                         .foregroundColor(.accentColor)
                         .colorInvert()
                         .padding()

@@ -61,45 +61,8 @@ struct ClipsView: View {
                 }
                 
                 NavigationStack {
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem](repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
-                            ForEach(clipsViewModel.clips, id: \.self) { clip in
-                                NavigationLink {
-                                    VideoView(videoViewModel: VideoView.VideoViewModel(videoId: clip.metadata.id))
-                                        .toolbar {
-                                            ToolbarItem(placement: .principal) {
-                                                VStack {
-                                                    Text("domino")
-                                                        .font(.custom("Montserrat-Medium", size: 20))
-                                                        .foregroundColor(Color.accentColor)
-                                                        .tracking(8)
-                                                    
-                                                    Text("movie")
-                                                        .font(.custom("Montserrat-Medium", size: 16))
-                                                        .foregroundColor(Color.accentColor)
-                                                        .tracking(4)
-                                                }
-                                                .offset(x: 4, y: -4)
-                                            }
-                                            ToolbarItem(placement: .navigationBarTrailing) {
-                                                Text(clip.metadata.code)
-                                                    .font(.custom("Montserrat-Medium", size: 12))
-                                                    .foregroundColor(Color.accentColor)
-                                                    .textSelection(.enabled)
-                                            }
-                                        }
-                                        .navigationBarTitleDisplayMode(.inline)
-                                        .toolbarBackground(.visible)
-                                } label: {
-                                    ClipView(clip: clip)
-                                }
-                            }
-                            .frame(height: (192 / 108) * geometry.size.width / 3)
-                        }
-                        .padding(.leading, 4)
-                        .padding(.trailing, 4)
-                    }
-                    .padding(.bottom, -12)
+                    ThreeColumnGrid(clips: clipsViewModel.clips, width: geometry.size.width)
+                        .padding(.bottom, -12)
                 }
 
                 ZStack {
@@ -128,7 +91,6 @@ struct ClipsView: View {
                             .background(Color.accentColor)
                             .cornerRadius(50)
                     }
-                    .opacity(clipsViewModel.uploadEnabled ? 1 : 0.5)
                     
                     Button(action: {
                         clipsViewModel.shareButtonPressed()
@@ -142,7 +104,6 @@ struct ClipsView: View {
                             .background(Color.accentColor)
                             .cornerRadius(50)
                     }
-                    .opacity(clipsViewModel.shareEnabled ? 1 : 0.5)
                 }
                 .opacity(clipsViewModel.code.isEmpty ? 0 : 1)
             }

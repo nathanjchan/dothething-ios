@@ -35,11 +35,12 @@ class Networker {
         task.resume()
     }
 
-    static func downloadProfileClips(completion: @escaping ([ClipMetadata]) -> Void) {
+    static func downloadProfileClips(batchIndex: Int, completion: @escaping ([ClipMetadata]) -> Void) {
         let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething")
         guard let requestUrl = url else { fatalError() }
         var request = URLRequest(url: requestUrl)
         request.httpMethod = "GET"
+        request.setValue(String(batchIndex), forHTTPHeaderField: "batch-index")
         request.setValue(GlobalConfig.shared.password, forHTTPHeaderField: "password")
         request.setValue(GlobalConfig.shared.sessionId, forHTTPHeaderField: "session-id")
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
@@ -63,12 +64,13 @@ class Networker {
         task.resume()
     }
 
-    static func downloadExistingThing(code: String, completion: @escaping ([ClipMetadata]) -> Void) {
+    static func downloadExistingThing(code: String, batchIndex: Int, completion: @escaping ([ClipMetadata]) -> Void) {
         let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/dothething")
         guard let url = url else { fatalError() }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue(code, forHTTPHeaderField: "code")
+        request.setValue(String(batchIndex), forHTTPHeaderField: "batch-index")
         request.setValue(GlobalConfig.shared.password, forHTTPHeaderField: "password")
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let error = error {
@@ -138,6 +140,63 @@ class Networker {
                             }
                         }
                         task.resume()
+                    }
+                }
+            }
+        }
+        task.resume()
+    }
+
+    static func getHomeFeed(batchIndex: Int, completion: @escaping ([ClipMetadata]) -> Void) {
+        let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/homefeed")
+        guard let url = url else { fatalError() }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue(String(batchIndex), forHTTPHeaderField: "batch-index")
+        request.setValue(GlobalConfig.shared.password, forHTTPHeaderField: "password")
+        request.setValue(GlobalConfig.shared.sessionId, forHTTPHeaderField: "session-id")
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                print("Error took place \(error)")
+                return
+            }
+            if let response = response as? HTTPURLResponse {
+                print("Response HTTP Status code: \(response.statusCode)")
+                if response.statusCode == 200 {
+                    if let data = data {
+                        let decoder = JSONDecoder()
+                        guard let dataArray = try? decoder.decode([ClipMetadata].self, from: data) else {
+                            fatalError("Failed to decode JSON")
+                        }
+                        completion(dataArray)
+                    }
+                }
+            }
+        }
+        task.resume()
+    }
+    
+    static func getInteractions(completion: @escaping (Int) -> Void) {
+        let url = URL(string: "https://kenv1ez376.execute-api.us-west-1.amazonaws.com/alpha/homefeed")
+        guard let url = url else { fatalError() }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue(GlobalConfig.shared.password, forHTTPHeaderField: "password")
+        request.setValue(GlobalConfig.shared.sessionId, forHTTPHeaderField: "session-id")
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                print("Error took place \(error)")
+                return
+            }
+            if let response = response as? HTTPURLResponse {
+                print("Response HTTP Status code: \(response.statusCode)")
+                if response.statusCode == 200 {
+                    if let data = data {
+                        let decoder = JSONDecoder()
+                        guard let number = try? decoder.decode(String.self, from: data) else {
+                            fatalError("Failed to decode JSON")
+                        }
+                        completion(Int(number) ?? 0)
                     }
                 }
             }

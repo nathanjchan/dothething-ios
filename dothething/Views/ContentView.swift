@@ -47,9 +47,6 @@ struct ContentView: View {
                                     authViewModel.tokenSignInExample(idToken: idToken)
                                 }
                             }
-                            DispatchQueue.main.async {
-                                authViewModel.isLoading = false
-                            }
                         }
                     }
                     .onOpenURL { url in
@@ -65,7 +62,7 @@ struct ContentView: View {
             .navigationDestination(isPresented: $authViewModel.isSignedIn) {
                 VStack {
                     if currentView == .home {
-                        HomeView(code: $code, currentView: $currentView)
+                        HomeView(currentView: $currentView)
                             .navigationBarBackButtonHidden(true)
                             .environmentObject(homeViewModel)
                     } else if currentView == .search {

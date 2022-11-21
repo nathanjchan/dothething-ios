@@ -90,47 +90,7 @@ struct ProfileView: View {
                     }
                     
                     NavigationStack {
-                        ScrollView {
-                            LazyVGrid(columns: [GridItem](repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
-                                ForEach(profileViewModel.clips, id: \.self) { clip in
-                                    NavigationLink {
-                                        VideoView(videoViewModel: VideoView.VideoViewModel(videoId: clip.metadata.id))
-                                            .toolbar {
-                                                ToolbarItem(placement: .principal) {
-                                                    VStack {
-                                                        Text("domino")
-                                                            .font(.custom("Montserrat-Medium", size: 20))
-                                                            .foregroundColor(Color.accentColor)
-                                                            .tracking(8)
-                                                        
-                                                        Text("movie")
-                                                            .font(.custom("Montserrat-Medium", size: 16))
-                                                            .foregroundColor(Color.accentColor)
-                                                            .tracking(4)
-                                                    }
-                                                    .offset(x: 4, y: -4)
-                                                }
-                                                ToolbarItem(placement: .navigationBarTrailing) {
-                                                    Text(clip.metadata.code)
-                                                        .font(.custom("Montserrat-Medium", size: 12))
-                                                        .foregroundColor(Color.accentColor)
-                                                        .textSelection(.enabled)
-                                                }
-                                            }
-                                            .navigationBarTitleDisplayMode(.inline)
-                                            .toolbarBackground(.visible)
-                                    } label: {
-                                        ClipView(clip: clip)
-
-                                    }
-                                }
-                                .frame(height: (192 / 108) * geometry.size.width / 3)
-                            }
-                            .padding(.leading, 4)
-                            .padding(.trailing, 4)
-                        }
-//                        .padding(.top, -16)
-//                        .padding(.bottom, -12)
+                        ThreeColumnGrid(clips: profileViewModel.clips, width: geometry.size.width)
                     }
                 }
             }
@@ -210,17 +170,18 @@ extension ProfileView {
         private func fetchClips() {
             print("Entered ProfileViewModel.fetchClips")
             self.isLoading = true
-            Networker.downloadProfileClips() { cmdArray in 
-                print("Downloaded \(cmdArray.count) clips: \(cmdArray)")
+            Networker.downloadProfileClips(batchIndex: 0) { cmdArray in 
+                print("Downloaded \(cmdArray.count) clips")
                 for cmd in cmdArray {
-                    usleep(100000) // 0.1 seconds
-                    Networker.downloadThumbnail(urlString: cmd.thumbnailUrl) { thumbnail in
-                        let clip = Clip(thumbnail: thumbnail, isHighlighted: false, metadata: cmd, showCode: true)
-                        DispatchQueue.main.async {
-                            self.clips.append(clip)
-                        }
-                        self.isLoading = false
+                    let dataDecoded = Data(base64Encoded: cmd.thumbnailBase64, options: .ignoreUnknownCharacters)
+                    let decodedimage = UIImage(data: dataDecoded ?? Data())
+                    let clip = Clip(thumbnail: decodedimage ?? UIImage(), isHighlighted: false, metadata: cmd, showCode: false)
+                    DispatchQueue.main.async {
+                        self.clips.append(clip)
                     }
+                }
+                DispatchQueue.main.async {
+                    self.isLoading = false
                 }
             }
         }

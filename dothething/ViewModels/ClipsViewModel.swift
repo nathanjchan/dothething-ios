@@ -11,7 +11,7 @@ struct ClipMetadata: Codable, Hashable {
     let code: String
     let id: String
     let timeOfCreation: String
-    let thumbnailUrl: String
+    let thumbnailBase64: String
 }
 
 struct Clip: Hashable {
@@ -37,8 +37,6 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=h7MYJghRWt0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: false),
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=njos57IJf-0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: false),
     ]
-    @Published var uploadEnabled = false
-    @Published var shareEnabled = false
     @Published var errorText = ""
     @Published var code = ""
     @Published var isLoading = false
@@ -63,7 +61,6 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
             self.code = code
             self.codeInternal = code
             self.downloadExistingThing()
-            self.checkIfUserUploadedToCode(code: code)
         }
         // otherwise ignore this onAppear if clips is not empty
     }
@@ -81,20 +78,12 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     
     func uploadButtonPressed() {
         print("Upload button pressed")
-        if uploadEnabled {
-            imagePicker.open()
-        } else {
-            Thinger.showAlert(title: "You've already uploaded to this cascade!", message: "", button: "OK")
-        }
+        imagePicker.open()
     }
     
     func shareButtonPressed() {
         print("Share button pressed")
-        if shareEnabled {
-            Thinger.showSharePopup(text: "I added my domino. Join the cascade with code \(codeInternal) on thedominoapp.com!")
-        } else {
-            Thinger.showAlert(title: "Please upload your domino before you share!", message: "", button: "OK")
-        }
+        Thinger.showSharePopup(text: "I added my domino. Join the cascade with code \(codeInternal) on thedominoapp.com!")
     }
 
     private func handleError(errorCode: String, logMessage: String = "") {
@@ -110,39 +99,14 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     
     private func startLoading() {
         DispatchQueue.main.async {
+            self.errorText = ""
             self.isLoading = true
-            self.uploadEnabled = false
-            self.shareEnabled = false
         }
     }
     
     private func stopLoading() {
         DispatchQueue.main.async {
             self.isLoading = false
-            if self.didUpload {
-                self.uploadEnabled = false
-                self.shareEnabled = true
-            } else {
-                self.uploadEnabled = true
-                self.shareEnabled = false
-            }
-        }
-    }
-
-    private func checkIfUserUploadedToCode(code: String) {
-        Networker.checkIfUserUploadedToCode(code: code) { didUpload in
-            self.didUpload = didUpload
-            DispatchQueue.main.async {
-                if self.didUpload {
-                    print("User has already uploaded to this code")
-                    self.uploadEnabled = false
-                    self.shareEnabled = true
-                } else {
-                    print("User has not uploaded to this code")
-                    self.uploadEnabled = true
-                    self.shareEnabled = false
-                }
-            }
         }
     }
 
@@ -152,21 +116,22 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         print("Code: \(codeInternal)")
         startLoading()
 
-        Networker.downloadExistingThing(code: codeInternal) { cmdArray in // clips metadata array
-            print("Downloaded \(cmdArray.count) clips: \(cmdArray)")
+        Networker.downloadExistingThing(code: codeInternal, batchIndex: 0) { cmdArray in // clips metadata array
+            print("Downloaded \(cmdArray.count) clips")
             if cmdArray.isEmpty {
                 self.handleError(errorCode: "INVALID_CODE")
                 return
             } else {
                 for cmd in cmdArray {
-                    usleep(100000) // 0.1 seconds
-                    Networker.downloadThumbnail(urlString: cmd.thumbnailUrl) { thumbnail in
-                        let clip = Clip(thumbnail: thumbnail, isHighlighted: false, metadata: cmd, showCode: false)
-                        DispatchQueue.main.async {
-                            self.clips.append(clip)
-                        }
-                        self.stopLoading()
+                    let dataDecoded = Data(base64Encoded: cmd.thumbnailBase64, options: .ignoreUnknownCharacters)
+                    let decodedimage = UIImage(data: dataDecoded ?? Data())
+                    let clip = Clip(thumbnail: decodedimage ?? UIImage(), isHighlighted: false, metadata: cmd, showCode: false)
+                    DispatchQueue.main.async {
+                        self.clips.append(clip)
                     }
+                }
+                DispatchQueue.main.async {
+                    self.stopLoading()
                 }
             }
         }
@@ -176,7 +141,6 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
         print("Entered ClipsViewModel.refresh")
         clearStorage()
         downloadExistingThing()
-        checkIfUserUploadedToCode(code: codeInternal)
     }
     
     // DEFCON 2
@@ -253,7 +217,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
 
                 // reload everything
                 self.clearStorage()
-                sleep(3)
+                sleep(1)
                 self.downloadExistingThing()
             }
             task.resume()
