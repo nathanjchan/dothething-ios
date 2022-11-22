@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		D800C65D291C8022003790B7 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D800C65C291C8022003790B7 /* SearchView.swift */; };
 		D800C65F291D04F7003790B7 /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D800C65E291D04F7003790B7 /* BottomBarView.swift */; };
+		D80ECA96292C83900060F4CD /* ThreeColumnGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80ECA95292C83900060F4CD /* ThreeColumnGrid.swift */; };
+		D80ECA98292C8C620060F4CD /* Clip.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80ECA97292C8C620060F4CD /* Clip.swift */; };
 		D851F4B8292104F6002B8C10 /* CameraOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = D851F4B7292104F6002B8C10 /* CameraOpener.swift */; };
 		D851F4BC2921E3F3002B8C10 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D851F4BB2921E3F3002B8C10 /* VideoView.swift */; };
 		D87C926C29010F2C003275C1 /* dothethingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87C926B29010F2C003275C1 /* dothethingApp.swift */; };
@@ -57,6 +59,8 @@
 /* Begin PBXFileReference section */
 		D800C65C291C8022003790B7 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		D800C65E291D04F7003790B7 /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
+		D80ECA95292C83900060F4CD /* ThreeColumnGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeColumnGrid.swift; sourceTree = "<group>"; };
+		D80ECA97292C8C620060F4CD /* Clip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clip.swift; sourceTree = "<group>"; };
 		D851F4B7292104F6002B8C10 /* CameraOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOpener.swift; sourceTree = "<group>"; };
 		D851F4BB2921E3F3002B8C10 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		D87C926829010F2B003275C1 /* dothething.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dothething.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -195,6 +199,7 @@
 				D800C65C291C8022003790B7 /* SearchView.swift */,
 				D800C65E291D04F7003790B7 /* BottomBarView.swift */,
 				D851F4BB2921E3F3002B8C10 /* VideoView.swift */,
+				D80ECA95292C83900060F4CD /* ThreeColumnGrid.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -209,6 +214,7 @@
 				D8E0F2E529173E08001BB23B /* Networker.swift */,
 				D8E0F2E72917AC84001BB23B /* Shapes.swift */,
 				D851F4B7292104F6002B8C10 /* CameraOpener.swift */,
+				D80ECA97292C8C620060F4CD /* Clip.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -353,6 +359,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D80ECA96292C83900060F4CD /* ThreeColumnGrid.swift in Sources */,
+				D80ECA98292C8C620060F4CD /* Clip.swift in Sources */,
 				D8E0F2DB290E612E001BB23B /* SignInView.swift in Sources */,
 				D851F4B8292104F6002B8C10 /* CameraOpener.swift in Sources */,
 				D800C65F291D04F7003790B7 /* BottomBarView.swift in Sources */,

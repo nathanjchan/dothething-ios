@@ -11,6 +11,15 @@ struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     @EnvironmentObject var profileViewModel: ProfileViewModel
 
+    struct CircleBorder: View {
+        var body: some View {
+            Circle()
+                .stroke(lineWidth: 6)
+                .frame(width: 126, height: 126)
+                .colorInvert()
+        }
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             NavigationStack {
@@ -27,44 +36,16 @@ struct ProfileView: View {
                         
                         HStack {
                             if let profilePicture = GlobalConfig.shared.profilePicture {
-                                // get image asynchronously
-                                AsyncImage(url: profilePicture) { image in
-                                    image
-                                        .resizable()
-                                        .frame(width: 120, height: 120)
-                                        .clipShape(Circle())
-                                        .overlay(
-                                            Circle()
-                                                .stroke(lineWidth: 6)
-                                                .frame(width: 126, height: 126)
-                                                .colorInvert()
-                                        )
-                                } placeholder: {
-                                    ZStack {
-                                        Circle()
-                                            .frame(width: 120, height: 120)
-                                            .foregroundColor(.gray)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(lineWidth: 6)
-                                                    .frame(width: 126, height: 126)
-                                                    .colorInvert()
-                                            )
-                                        
-                                        ProgressView()
-                                    }
-                                    
-                                }
+                                Image(uiImage: profilePicture)
+                                    .resizable()
+                                    .frame(width: 120, height: 120)
+                                    .clipShape(Circle())
+                                    .overlay(CircleBorder())
                             } else {
                                 Circle()
                                     .frame(width: 120, height: 120)
                                     .foregroundColor(.gray)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(lineWidth: 6)
-                                            .frame(width: 126, height: 126)
-                                            .colorInvert()
-                                    )
+                                    .overlay(CircleBorder())
                             }
                             
                             Spacer()
@@ -74,7 +55,6 @@ struct ProfileView: View {
                                 
                                 Text("sign out")
                                     .onTapGesture {
-                                        print("Sign out button pressed")
                                         authViewModel.handleSignOutButton()
                                     }
                             }
@@ -91,6 +71,7 @@ struct ProfileView: View {
                     
                     NavigationStack {
                         ThreeColumnGrid(clips: profileViewModel.clips, width: geometry.size.width)
+                            .padding(.top, -8)
                     }
                 }
             }
@@ -172,15 +153,8 @@ extension ProfileView {
             self.isLoading = true
             Networker.downloadProfileClips(batchIndex: 0) { cmdArray in 
                 print("Downloaded \(cmdArray.count) clips")
-                for cmd in cmdArray {
-                    let dataDecoded = Data(base64Encoded: cmd.thumbnailBase64, options: .ignoreUnknownCharacters)
-                    let decodedimage = UIImage(data: dataDecoded ?? Data())
-                    let clip = Clip(thumbnail: decodedimage ?? UIImage(), isHighlighted: false, metadata: cmd, showCode: false)
-                    DispatchQueue.main.async {
-                        self.clips.append(clip)
-                    }
-                }
                 DispatchQueue.main.async {
+                    self.clips = Thinger.clipsMetadataArrayToClipsArray(cmdArray: cmdArray)
                     self.isLoading = false
                 }
             }

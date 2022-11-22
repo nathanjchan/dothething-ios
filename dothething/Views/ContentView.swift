@@ -37,7 +37,9 @@ struct ContentView: View {
                                 guard let user = user else { return }
                                 GlobalConfig.shared.googleUser = user
                                 GlobalConfig.shared.name = user.profile?.givenName
-                                GlobalConfig.shared.profilePicture = user.profile?.imageURL(withDimension: 320)
+                                Networker.downloadProfilePicture(url: user.profile?.imageURL(withDimension: 320)) { image in
+                                    GlobalConfig.shared.profilePicture = image
+                                }
                                 print("Restored sign in with Google: \(GlobalConfig.shared.name ?? "no name")")
                                 
                                 user.authentication.do { authentication, error in

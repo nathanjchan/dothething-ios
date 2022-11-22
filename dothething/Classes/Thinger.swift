@@ -88,13 +88,29 @@ class Thinger {
     }
     
     static func showSharePopup(text: String) {
-        let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-        
-        let scenes = UIApplication.shared.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let window = windowScene?.windows.first
-        
-        activityViewController.popoverPresentationController?.sourceView = window?.rootViewController?.view
-        window?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+        DispatchQueue.main.async {
+            let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+            
+            let scenes = UIApplication.shared.connectedScenes
+            let windowScene = scenes.first as? UIWindowScene
+            let window = windowScene?.windows.first
+            
+            activityViewController.popoverPresentationController?.sourceView = window?.rootViewController?.view
+            window?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+        }
+    }
+
+    static func clipsMetadataArrayToClipsArray(cmdArray: [ClipMetadata]) -> [Clip] {
+        var clips: [Clip] = []
+        for (index, cmd) in cmdArray.enumerated() {
+            let dataDecoded = Data(base64Encoded: cmd.thumbnailBase64, options: .ignoreUnknownCharacters)
+            let decodedimage = UIImage(data: dataDecoded ?? Data())
+            if index < cmdArray.count - 1 {
+                clips.append(Clip(thumbnail: decodedimage ?? UIImage(), isHighlighted: false, metadata: cmd, showCode: false, nextClipId: cmdArray[index + 1].id))
+            } else {
+                clips.append(Clip(thumbnail: decodedimage ?? UIImage(), isHighlighted: false, metadata: cmd, showCode: false, nextClipId: nil))
+            }
+        }
+        return clips
     }
 }

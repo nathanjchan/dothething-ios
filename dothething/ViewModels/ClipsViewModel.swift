@@ -7,27 +7,6 @@
 
 import SwiftUI
 
-struct ClipMetadata: Codable, Hashable {
-    let code: String
-    let id: String
-    let timeOfCreation: String
-    let thumbnailBase64: String
-}
-
-struct Clip: Hashable {
-    let thumbnail: UIImage
-    let isHighlighted: Bool
-    let metadata: ClipMetadata
-    let showCode: Bool
-    
-    init(thumbnail: UIImage, isHighlighted: Bool, metadata: ClipMetadata, showCode: Bool) {
-        self.thumbnail = thumbnail
-        self.isHighlighted = isHighlighted
-        self.metadata = metadata
-        self.showCode = showCode
-    }
-}
-
 class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     @Published var clips: [Clip] = [
 //            Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: true, showCode: false),
@@ -83,7 +62,14 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     
     func shareButtonPressed() {
         print("Share button pressed")
-        Thinger.showSharePopup(text: "I added my domino. Join the cascade with code \(codeInternal) on thedominoapp.com!")
+        Networker.getShareMessage(code: codeInternal) { message in
+            if message.isEmpty {
+                let msg = "Check out this domino cascade that I made! Use code \(self.codeInternal) to join: https://master.d1yarv3zeb5tjh.amplifyapp.com/?code=\(self.codeInternal)"
+                Thinger.showSharePopup(text: msg)
+            } else {
+                Thinger.showSharePopup(text: message)
+            }
+        }
     }
 
     private func handleError(errorCode: String, logMessage: String = "") {
@@ -122,16 +108,9 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
                 self.handleError(errorCode: "INVALID_CODE")
                 return
             } else {
-                for cmd in cmdArray {
-                    let dataDecoded = Data(base64Encoded: cmd.thumbnailBase64, options: .ignoreUnknownCharacters)
-                    let decodedimage = UIImage(data: dataDecoded ?? Data())
-                    let clip = Clip(thumbnail: decodedimage ?? UIImage(), isHighlighted: false, metadata: cmd, showCode: false)
-                    DispatchQueue.main.async {
-                        self.clips.append(clip)
-                    }
-                }
                 DispatchQueue.main.async {
-                    self.stopLoading()
+                    self.clips = Thinger.clipsMetadataArrayToClipsArray(cmdArray: cmdArray)
+                    self.isLoading = false
                 }
             }
         }

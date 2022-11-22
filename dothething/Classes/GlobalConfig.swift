@@ -13,7 +13,7 @@ class GlobalConfig {
     var signInConfig: GIDConfiguration
     var googleUser: GIDGoogleUser?
     var name: String?
-    var profilePicture: URL?
+    var profilePicture: UIImage?
     var sessionId: String?
     let password = "ThisIsEpicPassword"
 

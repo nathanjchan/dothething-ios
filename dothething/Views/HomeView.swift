@@ -7,58 +7,6 @@
 
 import SwiftUI
 
-struct ThreeColumnGrid: View {
-    var clips: [Clip] = []
-    var width: CGFloat
-    
-    init(clips: [Clip], width: CGFloat) {
-        self.clips = clips
-        self.width = width
-    }
-    
-    var body: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem](repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
-                ForEach(clips, id: \.self) { clip in
-                    NavigationLink {
-                        VideoView(videoViewModel: VideoView.VideoViewModel(videoId: clip.metadata.id))
-                            .toolbar {
-                                ToolbarItem(placement: .principal) {
-                                    VStack {
-                                        Text("domino")
-                                            .font(.custom("Montserrat-Medium", size: 20))
-                                            .foregroundColor(Color.accentColor)
-                                            .tracking(8)
-                                        
-                                        Text("movie")
-                                            .font(.custom("Montserrat-Medium", size: 16))
-                                            .foregroundColor(Color.accentColor)
-                                            .tracking(4)
-                                    }
-                                    .offset(x: 4, y: -4)
-                                }
-                                ToolbarItem(placement: .navigationBarTrailing) {
-                                    Text(clip.metadata.code)
-                                        .font(.custom("Montserrat-Medium", size: 12))
-                                        .foregroundColor(Color.accentColor)
-                                        .textSelection(.enabled)
-                                }
-                            }
-                            .navigationBarTitleDisplayMode(.inline)
-                            .toolbarBackground(.visible)
-                    } label: {
-                        ClipView(clip: clip)
-
-                    }
-                }
-                .frame(height: (192 / 108) * width / 3)
-            }
-            .padding(.leading, 4)
-            .padding(.trailing, 4)
-        }
-    }
-}
-
 struct HomeView: View {
     @EnvironmentObject var homeViewModel: HomeViewModel
     @Binding var currentView: CurrentView
@@ -98,6 +46,7 @@ struct HomeView: View {
                 
                 NavigationStack {
                     ThreeColumnGrid(clips: homeViewModel.clips, width: geometry.size.width)
+                        .padding(.top, -8)
                 }
                 .toolbar {
                     ToolbarItem(placement: .principal) {
@@ -146,24 +95,25 @@ extension HomeView {
         @Published var isLoading: Bool = false
         @Published var clips: [Clip] = []
         @Published var interactions: Int?
+        private var didFirstLoad: Bool = false
 
         init() {
             print("Initializing HomeViewModel")
         }
         
         func handleOnAppear() {
-            getInteractions()
-            if clips.isEmpty && !isLoading {
+            print("Entered HomeViewModel.handleOnAppear")
+            if !didFirstLoad && !isLoading {
+                didFirstLoad = true
+                getInteractions()
                 getHomeFeed()
             }
         }
         
         func refresh() {
+            print("Entered HomeViewModel.refresh")
             getInteractions()
-            DispatchQueue.main.async {
-                self.clips = []
-            }
-            self.getHomeFeed()
+            getHomeFeed()
         }
         
         func getInteractions() {
@@ -181,15 +131,8 @@ extension HomeView {
             isLoading = true
             Networker.getHomeFeed(batchIndex: 0) { cmdArray in
                 print("Downloaded \(cmdArray.count) clips")
-                for cmd in cmdArray {
-                    let dataDecoded = Data(base64Encoded: cmd.thumbnailBase64, options: .ignoreUnknownCharacters)
-                    let decodedimage = UIImage(data: dataDecoded ?? Data())
-                    let clip = Clip(thumbnail: decodedimage ?? UIImage(), isHighlighted: false, metadata: cmd, showCode: false)
-                    DispatchQueue.main.async {
-                        self.clips.append(clip)
-                    }
-                }
                 DispatchQueue.main.async {
+                    self.clips = Thinger.clipsMetadataArrayToClipsArray(cmdArray: cmdArray)
                     self.isLoading = false
                 }
             }
