@@ -140,7 +140,7 @@ extension UploadView {
         private lazy var cameraOpener = CameraOpener(messenger: self)
         
         init() {
-            print("Intializing UploadViewModel")
+            print("Initializing UploadViewModel")
         }
 
         func openCamera() {

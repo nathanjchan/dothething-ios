@@ -38,14 +38,8 @@ struct HomeView: View {
                 }
                 .font(.custom("Montserrat-Light", size: 16))
                 
-                if homeViewModel.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .padding()
-                }
-                
                 NavigationStack {
-                    ThreeColumnGrid(clips: homeViewModel.clips, width: geometry.size.width)
+                    ThreeColumnGrid(clips: homeViewModel.clips, width: geometry.size.width, loadMoreMessenger: homeViewModel)
                         .padding(.top, -8)
                 }
                 .toolbar {
@@ -91,18 +85,18 @@ struct HomeView_Previews: PreviewProvider {
 }
 
 extension HomeView {
-    class HomeViewModel: ObservableObject {
-        @Published var isLoading: Bool = false
+    class HomeViewModel: ObservableObject, LoadMoreMessenger {
         @Published var clips: [Clip] = []
         @Published var interactions: Int = 0
         private var didFirstLoad: Bool = false
+        private var currentBatchIndex: Int = 0
 
         init() {
-            print("Initializing HomeViewModel")
+            print(#function)
         }
         
         func clearStorage() {
-            print("Entered HomeViewModel.clearStorage")
+            print(#function)
             DispatchQueue.main.async {
                 self.clips = []
                 self.interactions = 0
@@ -111,8 +105,8 @@ extension HomeView {
         }
         
         func handleOnAppear() {
-            print("Entered HomeViewModel.handleOnAppear")
-            if !didFirstLoad && !isLoading {
+            print(#function)
+            if !didFirstLoad {
                 didFirstLoad = true
                 getInteractions()
                 getHomeFeed()
@@ -120,13 +114,16 @@ extension HomeView {
         }
         
         func refresh() {
-            print("Entered HomeViewModel.refresh")
+            print(#function)
+            DispatchQueue.main.async {
+                self.clips = []
+            }
             getInteractions()
             getHomeFeed()
         }
         
         func getInteractions() {
-            print("Entered HomeViewModel.getInteractions")
+            print(#function)
             Networker.getInteractions { number in
                 print("Number of interactions: \(number)")
                 DispatchQueue.main.async {
@@ -136,15 +133,24 @@ extension HomeView {
         }
 
         func getHomeFeed() {
-            print("Entered HomeViewModel.getHomeFeed")
-            isLoading = true
-            Networker.getHomeFeed(batchIndex: 0) { cmdArray in
+            print(#function)
+            print("currentBatchIndex=\(currentBatchIndex)")
+            Networker.getHomeFeed(batchIndex: currentBatchIndex) { cmdArray in
                 print("Downloaded \(cmdArray.count) clips")
-                DispatchQueue.main.async {
-                    self.clips = Thinger.clipsMetadataArrayToClipsArray(cmdArray: cmdArray)
-                    self.isLoading = false
+                if cmdArray.isEmpty && self.currentBatchIndex > 0 {
+                    self.currentBatchIndex -= 1
+                } else {
+                    DispatchQueue.main.async {
+                        self.clips.append(contentsOf: Thinger.clipsMetadataArrayToClipsArray(cmdArray: cmdArray))
+                    }
                 }
             }
+        }
+        
+        func loadMore() {
+            print(#function)
+            currentBatchIndex += 1
+            getHomeFeed()
         }
     }
 }

@@ -7,9 +7,14 @@
 
 import SwiftUI
 
+protocol LoadMoreMessenger {
+    func loadMore()
+}
+
 struct ThreeColumnGrid: View {
     var clips: [Clip]
     var width: CGFloat
+    var loadMoreMessenger: LoadMoreMessenger
     
     var body: some View {
         ScrollView {
@@ -50,12 +55,23 @@ struct ThreeColumnGrid: View {
             }
             .padding(.leading, 4)
             .padding(.trailing, 4)
+            
+            Button(action: {
+                loadMoreMessenger.loadMore()
+            }) {
+                Text("load more")
+                    .font(.custom("Montserrat-Light", size: 16))
+                    .foregroundColor(Color.accentColor)
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
+                    .opacity(clips.isEmpty ? 0 : 1)
+            }
         }
     }
 }
 
 struct ThreeColumnGrid_Previews: PreviewProvider {
     static var previews: some View {
-        ThreeColumnGrid(clips: [], width: 1080)
+        ThreeColumnGrid(clips: [], width: 1080, loadMoreMessenger: ProfileView.ProfileViewModel())
     }
 }

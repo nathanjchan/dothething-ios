@@ -63,16 +63,8 @@ struct ProfileView: View {
                         .padding(.horizontal, 16)
                     }
                     
-                    if profileViewModel.isLoading {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .padding()
-                    }
-                    
-                    NavigationStack {
-                        ThreeColumnGrid(clips: profileViewModel.clips, width: geometry.size.width)
-                            .padding(.top, -8)
-                    }
+                    ThreeColumnGrid(clips: profileViewModel.clips, width: geometry.size.width, loadMoreMessenger: profileViewModel)
+                        .padding(.top, -8)
                 }
             }
             .toolbar {
@@ -116,60 +108,67 @@ struct ProfileView_Previews: PreviewProvider {
 }
 
 extension ProfileView {
-    class ProfileViewModel: ObservableObject {
-        @Published var clips: [Clip] = [
-            // Clip(url: URL(string: "https://www.youtube.com/watch?v=QH2-TGUlwu4") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: true),
-            // Clip(url: URL(string: "https://www.youtube.com/watch?v=9bZkp7q19f0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: true),
-            // Clip(url: URL(string: "https://www.youtube.com/watch?v=p3G5IXn0K7A") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: true),
-            // Clip(url: URL(string: "https://www.youtube.com/watch?v=sXWjwUl949Y") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: true),
-            // Clip(url: URL(string: "https://www.youtube.com/watch?v=h7MYJghRWt0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: true),
-            // Clip(url: URL(string: "https://www.youtube.com/watch?v=njos57IJf-0") ?? URL(fileURLWithPath: ""), thumbnail: UIImage(), isHighlighted: false, showCode: true),
-        ]
-        @Published var isLoading = false
+    class ProfileViewModel: ObservableObject, LoadMoreMessenger {
+        @Published var clips: [Clip] = []
         @Published var errorText = ""
+        private var didFirstLoad: Bool = false
+        private var currentBatchIndex: Int = 0
 
         init() {
-            print("Initializing ProfileViewModel")
+            print(#function)
         }
         
         func clearStorage() {
-            print("Entered ProfileViewModel.clearStorage")
+            print(#function)
             DispatchQueue.main.async {
                 self.clips = []
                 self.errorText = ""
+                self.didFirstLoad = false
             }
         }
 
         private func handleError(errorCode: String, logMessage: String = "") {
+            print(#function)
             DispatchQueue.main.async {
-                self.isLoading = false
                 self.errorText = "Error Code \(errorCode)"
                 print("Error Code \(errorCode) \(logMessage)")
             }
         }
         
         func handleOnAppear() {
-            if clips.isEmpty && !isLoading {
+            print(#function)
+            if !didFirstLoad {
+                didFirstLoad = true
                 fetchClips()
             }
         }
 
         private func fetchClips() {
-            print("Entered ProfileViewModel.fetchClips")
-            self.isLoading = true
-            Networker.downloadProfileClips(batchIndex: 0) { cmdArray in 
+            print(#function)
+            print("currentBatchIndex=\(currentBatchIndex)")
+            Networker.downloadProfileClips(batchIndex: currentBatchIndex) { cmdArray in
                 print("Downloaded \(cmdArray.count) clips")
-                DispatchQueue.main.async {
-                    self.clips = Thinger.clipsMetadataArrayToClipsArray(cmdArray: cmdArray)
-                    self.isLoading = false
+                if cmdArray.isEmpty && self.currentBatchIndex > 0 {
+                    self.currentBatchIndex -= 1
+                } else {
+                    DispatchQueue.main.async {
+                        self.clips.append(contentsOf: Thinger.clipsMetadataArrayToClipsArray(cmdArray: cmdArray))
+                    }
                 }
             }
         }
 
         func refresh() {
+            print(#function)
             DispatchQueue.main.async {
                 self.clips = []
             }
+            fetchClips()
+        }
+        
+        func loadMore() {
+            print(#function)
+            currentBatchIndex += 1
             fetchClips()
         }
     }
