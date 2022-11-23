@@ -62,7 +62,7 @@ struct SearchView: View, KeyboardReadable {
                         .foregroundColor(Color.accentColor)
                         .padding(.trailing, 16)
                         .onTapGesture {
-                            if code.count == 7 || code == "dothethingtest" {
+                            if code.count == 8 || code == "dothethingtest" {
                                 showClipsView = true
                                 searchViewModel.saveCode(code: code)
                             }

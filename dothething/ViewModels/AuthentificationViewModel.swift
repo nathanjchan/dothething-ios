@@ -27,16 +27,16 @@ class AuthenticationViewModel: ObservableObject {
         let task = URLSession.shared.uploadTask(with: request, from: authData) { data, response, error in
             if let data = data {
                 let dataString = String(data: data, encoding: .utf8)
-                print(dataString ?? "no data")
+                print("\(#function) \(dataString ?? "no data")")
             }
             
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 {
-                    print("Logged in successfully")
+                    print("\(#function) Logged in successfully")
                     let decoder = JSONDecoder()
                     if let data = data, let signInResponse = try? decoder.decode(SignInResponse.self, from: data) {
-                        print("sessionId: \(signInResponse.sessionId)")
-                        print("message: \(signInResponse.message)")
+                        print("\(#function) sessionId: \(signInResponse.sessionId)")
+                        print("\(#function) message: \(signInResponse.message)")
                         GlobalConfig.shared.sessionId = signInResponse.sessionId
                     }
                     DispatchQueue.main.async {

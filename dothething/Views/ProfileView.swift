@@ -128,10 +128,16 @@ extension ProfileView {
         @Published var isLoading = false
         @Published var errorText = ""
 
-        private var videoDegreesToRotate = -90
-
         init() {
             print("Initializing ProfileViewModel")
+        }
+        
+        func clearStorage() {
+            print("Entered ProfileViewModel.clearStorage")
+            DispatchQueue.main.async {
+                self.clips = []
+                self.errorText = ""
+            }
         }
 
         private func handleError(errorCode: String, logMessage: String = "") {

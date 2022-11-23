@@ -23,7 +23,7 @@ struct HomeView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                Text("dominos in your cascades: \(homeViewModel.interactions ?? 0)")
+                Text("dominos in your cascades: \(homeViewModel.interactions)")
                     .font(.custom("Montserrat-medium", size: 16))
                     .padding(.top, 12)
                     .padding(.bottom, 4)
@@ -94,11 +94,20 @@ extension HomeView {
     class HomeViewModel: ObservableObject {
         @Published var isLoading: Bool = false
         @Published var clips: [Clip] = []
-        @Published var interactions: Int?
+        @Published var interactions: Int = 0
         private var didFirstLoad: Bool = false
 
         init() {
             print("Initializing HomeViewModel")
+        }
+        
+        func clearStorage() {
+            print("Entered HomeViewModel.clearStorage")
+            DispatchQueue.main.async {
+                self.clips = []
+                self.interactions = 0
+                self.didFirstLoad = false
+            }
         }
         
         func handleOnAppear() {

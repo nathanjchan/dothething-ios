@@ -19,11 +19,8 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     @Published var errorText = ""
     @Published var code = ""
     @Published var isLoading = false
-    @Published var buttonText = "place a domino"
 
-    private var didUpload = true
     private var codeInternal = ""
-    private var videoDegreesToRotate = -90
     private lazy var imagePicker = ImagePicker(messenger: self)
 
     init() {
@@ -32,10 +29,10 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
 
     func onAppear(code: String) {
         if code.isEmpty && self.codeInternal.isEmpty {
-            print("Entered ClipsView onAppear with empty code")
+            print("Entered ClipsViewModel.onAppear with empty code")
             imagePicker.open()
         } else if self.clips.isEmpty || self.code != code || self.codeInternal != code {
-            print("Entered ClipsView.onAppear: code=\(code)")
+            print("Entered ClipsViewModel.onAppear: code=\(code)")
             self.clips = []
             self.code = code
             self.codeInternal = code
@@ -45,23 +42,25 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
     }
     
     private func clearStorage() {
+        print("Entered ClipsViewModel.clearStorage")
         DispatchQueue.main.async {
             self.clips = []
+            self.errorText = ""
         }
     }
     
     func backButtonPressed() {
-        print("Back button pressed")
+        print("Entered ClipsViewModel.backButtonPressed")
         clearStorage()
     }
     
     func uploadButtonPressed() {
-        print("Upload button pressed")
+        print("Entered ClipsViewModel.uploadButtonPressed")
         imagePicker.open()
     }
     
     func shareButtonPressed() {
-        print("Share button pressed")
+        print("Entered ClipsViewModel.shareButtonPressed")
         Networker.getShareMessage(code: codeInternal) { message in
             if message.isEmpty {
                 let msg = "Check out this domino cascade that I made! Use code \(self.codeInternal) to join: https://master.d1yarv3zeb5tjh.amplifyapp.com/?code=\(self.codeInternal)"
@@ -98,7 +97,7 @@ class ClipsViewModel: ObservableObject, ImagePickerMessenger {
 
     // DEFCON 1
     func downloadExistingThing() {
-        print("Entered downloadExistingThing")
+        print("Entered ClipsViewModel.downloadExistingThing")
         print("Code: \(codeInternal)")
         startLoading()
 

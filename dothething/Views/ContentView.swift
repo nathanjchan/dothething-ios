@@ -30,11 +30,21 @@ struct ContentView: View {
                 SignInView()
                     .onAppear {
                         currentView = .home
+                        homeViewModel.clearStorage()
+                        profileViewModel.clearStorage()
                         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
                             if let error = error {
                                 print(error.localizedDescription)
+                                DispatchQueue.main.async {
+                                    authViewModel.isLoading = false
+                                }
                             } else {
-                                guard let user = user else { return }
+                                guard let user = user else {
+                                    DispatchQueue.main.async {
+                                        authViewModel.isLoading = false
+                                    }
+                                    return
+                                }
                                 GlobalConfig.shared.googleUser = user
                                 GlobalConfig.shared.name = user.profile?.givenName
                                 Networker.downloadProfilePicture(url: user.profile?.imageURL(withDimension: 320)) { image in
